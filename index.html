@@ -1086,8 +1086,13 @@ function viz_render(host,b,ac){
     if(cond>0.6){ dc.strokeStyle=`rgba(255,255,255,${(cond-0.6)*0.9})`; dc.lineWidth=1*D;
       edges.forEach(e=>{ const A=proj(cube[e[0]],rot),B=proj(cube[e[1]],rot); dc.beginPath(); dc.moveTo(A[0],A[1]); dc.lineTo(B[0],B[1]); dc.stroke(); }); }
   }
-  draw();
-  const stop=reduced?null:raf(draw);
+  cloudWrap.style.display='none';   /* cloud is a FALLBACK only: shown when a photo is missing */
+  let stop=null, cloudOn=false;
+  function evalCloud(){
+    const want=(missing[0]===true)||(missing[1]===true);
+    if(want&&!cloudOn){ cloudOn=true; cloudWrap.style.display=''; draw(); if(!reduced) stop=raf(draw); }
+    else if(!want&&cloudOn){ cloudOn=false; if(stop){stop();stop=null;} cloudWrap.style.display='none'; }
+  }
 
   /* --- Unreal photos (primary content when present) --- */
   const grid=document.createElement('div'); grid.className='renderphotos'; host.appendChild(grid);
@@ -1096,7 +1101,7 @@ function viz_render(host,b,ac){
     { sources:['assets/unreal-1.jpg','assets/unreal-1.png'], filename:'assets/unreal-1.jpg', cap:'bassa confidenza · nuvola' },
     { sources:['assets/unreal-2.jpg','assets/unreal-2.png'], filename:'assets/unreal-2.jpg', cap:'alta confidenza · mesh solida' },
   ];
-  const missing=[true,true];
+  const missing=[null,null];   /* null = not yet probed; true = absent; false = present */
   function refreshHint(){ hint.style.opacity = (missing[0]||missing[1]) ? '' : '0'; }
   const slots=specs.map((sp,i)=>{
     const cell=document.createElement('div'); cell.className='rphoto';
@@ -1106,7 +1111,7 @@ function viz_render(host,b,ac){
     return createMediaSlot(frame,{
       kind:'image', sources:sp.sources, filename:sp.filename, permName:sp.filename,
       label:'Foto Unreal mancante', hint:'trascina o clicca', accentHex:ac,
-      onState:(present)=>{ missing[i]=!present; cell.classList.toggle('has-photo',present); refreshHint(); }
+      onState:(present)=>{ missing[i]=!present; cell.classList.toggle('has-photo',present); refreshHint(); evalCloud(); }
     });
   });
   refreshHint();

@@ -118,7 +118,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 /* ---------- overlays (intro / outro) ---------- */
 .overlay{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:center;
   padding:7vh var(--edge);opacity:0;visibility:hidden;pointer-events:none;
-  background:radial-gradient(120% 100% at 30% 45%,rgba(6,7,12,.55),rgba(6,7,12,.9));
+  background:radial-gradient(120% 100% at 30% 45%,rgba(6,7,12,.5),rgba(6,7,12,.82));
+  -webkit-backdrop-filter:blur(26px) saturate(112%);backdrop-filter:blur(26px) saturate(112%);
   transition:opacity .7s ease,visibility 0s .7s}
 .overlay.show{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .7s ease}
 .kick{font-family:var(--mono);font-size:clamp(11px,1.05vw,15px);letter-spacing:.32em;

@@ -82,32 +82,34 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 .flowdot{fill:var(--flowdot);opacity:0}
 
 /* ---------- detail panel (screen-space) ---------- */
-#panel{position:fixed;z-index:4;right:3.4vw;top:12.5vh;width:min(40vw,600px);height:75vh;
+#panel{position:fixed;z-index:4;right:3.4vw;top:50%;width:min(40vw,600px);height:auto;max-height:94vh;
+  overflow-y:auto;scrollbar-width:none;
   display:flex;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;
-  transform:translateX(26px);transition:opacity .55s ease,transform .6s cubic-bezier(.2,.7,.2,1),visibility 0s .55s}
-#panel.show{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition:opacity .55s ease .1s,transform .65s cubic-bezier(.2,.7,.2,1) .1s}
+  transform:translate(26px,-50%);transition:opacity .55s ease,transform .6s cubic-bezier(.2,.7,.2,1),visibility 0s .55s}
+#panel::-webkit-scrollbar{display:none}
+#panel.show{opacity:1;visibility:visible;pointer-events:auto;transform:translate(0,-50%);transition:opacity .55s ease .1s,transform .65s cubic-bezier(.2,.7,.2,1) .1s}
 #panel::before{content:"";position:fixed;right:0;top:0;height:100%;width:50vw;z-index:-1;pointer-events:none;
   background:linear-gradient(90deg,transparent,rgba(var(--scrim),.72) 36%,rgba(var(--scrim),.93) 62%);
   -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);opacity:0;transition:opacity .5s ease}
 #panel.show::before{opacity:1}
-.phead{border-left:2px solid var(--ac);padding-left:1.1rem;margin-bottom:1.4rem}
+.phead{border-left:2px solid var(--ac);padding-left:1.1rem;margin-bottom:1rem}
 .pkick{font-family:var(--mono);font-size:clamp(11px,1vw,14px);letter-spacing:.28em;text-transform:uppercase;
   color:var(--ac);display:flex;align-items:center;gap:.7rem}
-.ptitle{font-size:clamp(26px,3.2vw,44px);font-weight:770;letter-spacing:-.02em;line-height:1.02;margin:.6rem 0 .7rem;text-wrap:balance}
+.ptitle{font-size:clamp(24px,2.9vw,39px);font-weight:770;letter-spacing:-.02em;line-height:1.03;margin:.45rem 0 .55rem;text-wrap:balance}
 .ptag{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:12px;
   padding:.28rem .7rem;border-radius:20px;border:1px solid var(--line);color:var(--ink2);text-transform:uppercase;letter-spacing:.08em}
 .ptag::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--cyan)}
 .ptag.silvia::before{background:var(--rose)}
-.psteps{display:flex;flex-direction:column;gap:.7rem;overflow:hidden;flex:1}
+.psteps{display:flex;flex-direction:column;gap:.55rem;overflow:visible;flex:none}
 .frag{opacity:0;transform:translateY(12px);filter:blur(2px);
   transition:opacity .45s ease,transform .5s cubic-bezier(.2,.7,.2,1),filter .45s ease;
   background:rgba(var(--frag-bg),.9);border:1px solid var(--line);border-left:3px solid var(--ac);
-  border-radius:12px;padding:.85rem 1.1rem;-webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px)}
+  border-radius:12px;padding:.68rem 1rem;-webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px)}
 .frag.on{opacity:1;transform:none;filter:none}
 .ft{font-size:clamp(15px,1.35vw,19px);font-weight:680;color:var(--ink);letter-spacing:-.01em}
-.fb{font-size:clamp(13px,1.05vw,15.5px);color:var(--ink2);line-height:1.42;margin-top:.25rem}
+.fb{font-size:clamp(13px,1.05vw,15px);color:var(--ink2);line-height:1.38;margin-top:.22rem}
 .pcount{font-family:var(--mono);font-size:12.5px;color:var(--ink3);letter-spacing:.16em;
-  margin-top:1.1rem;text-align:right}
+  margin-top:.75rem;text-align:right}
 .pcount b{color:var(--ac)}
 
 /* ---------- stage visual (screen-space, LEFT) ---------- */
@@ -318,7 +320,7 @@ const BLOCKS = [
       { t:'Rifiuto artefatti', b:'Le finestre con ampiezza oltre ±150 µV picco-picco vengono scartate prima dell’encoding.' },
       { t:'EEGFrame indipendente', b:'Il segnale è convertito in un EEGFrame hardware-indipendente, trasmesso via WebSocket all’encoder.' },
     ] },
-  { id:'encoder',   n:'02', presenter:'m', accent:'cyan',   x: 1080, y: 560,  w: 400, h: 220,
+  { id:'encoder',   n:'02', presenter:'s', accent:'cyan',   x: 1080, y: 560,  w: 400, h: 220,
     title:'Channel-agnostic encoder', tag:'Encoder', oneLiner:'Allinea l’EEG allo spazio semantico di DINOv2.', steps:[
       { t:'EnigmaBrainMap', b:'CNN da circa 8.7M di parametri ispirata all’architettura ENIGMA, dedicata alla mappatura del segnale corticale.' },
       { t:'CLS 1536-dim', b:'Produce un vettore CLS a 1536 dimensioni, ℓ2-normalizzato nello spazio DINOv2 Giant, la stessa interfaccia di Hunyuan3D, senza adapter intermedi.' },
@@ -334,7 +336,7 @@ const BLOCKS = [
       { t:'Top-1 mostrato', b:'Il CLS EEG funge da query: il top-1 (immagine, label, cosine_sim) viene mostrato prima ancora della mesh.' },
       { t:'Catalogo globale', b:'Il catalogo cresce nel tempo ma resta globale: la personalizzazione vive nell’encoder, non nel retrieval.' },
     ] },
-  { id:'gen',       n:'04', presenter:'m', accent:'cyan',   x: 2600, y: 560,  w: 380, h: 220,
+  { id:'gen',       n:'04', presenter:'s', accent:'cyan',   x: 2600, y: 560,  w: 380, h: 220,
     title:'3D generation',            tag:'Generazione 3D', oneLiner:'Dall’immagine recuperata a una mesh solida in secondi.', steps:[
       { t:'Hunyuan3D 2.1 mini-turbo', b:'Generazione image-to-3D con flow-matching in 25-30 step di diffusione.' },
       { t:'Input: immagine, non embedding', b:'Il modello riceve l’immagine recuperata, non l’embedding CLS, come conditioning.' },
@@ -342,7 +344,7 @@ const BLOCKS = [
       { t:'Output GLB', b:'Il risultato è un singolo oggetto in formato GLB, generato uno alla volta.' },
       { t:'Collo di bottiglia', b:'2-3 secondi su GPU H200: è il vincolo che giustifica il rendering progressivo a valle.' },
     ] },
-  { id:'render',    n:'05', presenter:'s', accent:'rose',   x: 3360, y: 560,  w: 400, h: 220,
+  { id:'render',    n:'05', presenter:'m', accent:'rose',   x: 3360, y: 560,  w: 400, h: 220,
     title:'Volumetric rendering',     tag:'Dream state', oneLiner:'L’incertezza si vede: nuvola che diventa superficie.', steps:[
       { t:'Incertezza visibile', b:'Nuvola di particelle Niagara con curl-noise in UE5 rende visibile l’incertezza del modello.' },
       { t:'Densità come confidenza', b:'La densità della nuvola codifica la confidenza, fino a solidificarsi in superficie con Lumen e Nanite.' },
@@ -358,7 +360,7 @@ const BLOCKS = [
       { t:'Coppia di calibrazione', b:'La coppia (truth, brain-map) viene persistita su disco come dato di calibrazione.' },
       { t:'Chiude il loop', b:'Chiude il co-imagining loop: il sistema non è un decoder one-shot, ma impara dal nome pronunciato.' },
     ] },
-  { id:'arbiter',   n:'07', presenter:'s', accent:'amber',  x: 2560, y: 1720, w: 400, h: 220,
+  { id:'arbiter',   n:'07', presenter:'m', accent:'amber',  x: 2560, y: 1720, w: 400, h: 220,
     title:'Cosine similarity · arbitro', tag:'Arbitro', oneLiner:'La similarità coseno decide: solidifica o rigenera.', steps:[
       { t:'Similarità vs soglia', b:'s = cos(z_truth, z_hyp) viene confrontata con la soglia θ per arbitrare l’ipotesi.' },
       { t:'Commit (s ≥ θ)', b:'Se s ≥ θ la mesh si solidifica, il target LoRA è il CLS di retrieval, nessuna nuova voce nel catalogo.' },
@@ -374,7 +376,7 @@ const BLOCKS = [
       { t:'Personalizzazione isolata', b:'L’adattamento personalizza il modello senza toccare i pesi pretrained condivisi.' },
       { t:'Update rapido', b:'L’update LoraUpdate richiede 1-3 secondi su GPU H200.' },
     ] },
-  { id:'dbupdate',  n:'+',  presenter:'s', accent:'violet', x: 720,  y: 1560, w: 380, h: 220,
+  { id:'dbupdate',  n:'+',  presenter:'m', accent:'violet', x: 720,  y: 1560, w: 380, h: 220,
     title:'DB update',                tag:'Catalogo', oneLiner:'Il catalogo globale cresce da ogni rifiuto.', steps:[
       { t:'Catalogo dinamico', b:'Il catalogo di retrieval non è statico, ma evolve con l’uso del sistema.' },
       { t:'Nuova entry su rifiuto', b:'Una nuova voce viene aggiunta solo quando l’ipotesi è respinta (s<θ): truth CLS, immagine e label.' },

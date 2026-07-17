@@ -178,6 +178,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 }
 
 .media-video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block}
+.playbtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;
+  width:76px;height:76px;border-radius:50%;border:1px solid rgba(255,255,255,.28);
+  background:rgba(var(--scrim),.5);color:#fff;cursor:pointer;padding:0;
+  display:flex;align-items:center;justify-content:center;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  box-shadow:0 10px 34px rgba(0,0,0,.45);transition:transform .2s ease,background .2s ease}
+.playbtn:hover{transform:translate(-50%,-50%) scale(1.07);background:rgba(var(--scrim),.68)}
+.playbtn svg{margin-left:4px}
 .media-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:var(--bg2)}
 
 .mediaslot{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -905,7 +913,7 @@ function createMediaSlot(mount, opts){
   function showMedia(url,isObj){
     clear();
     if(isObj) objUrl=url;
-    let m;
+    let m, playOverlay=null;
     if(kind==='video'){
       m=document.createElement('video');
       m.className='media-video'; m.src=url;
@@ -914,16 +922,29 @@ function createMediaSlot(mount, opts){
       m.controls = !ambient;
       m.muted = ambient; m.loop = ambient; m.autoplay = ambient;
       m.setAttribute('playsinline',''); m.preload = ambient ? 'auto' : 'metadata';
+      if(opts.poster) m.poster = opts.poster;
       /* fit the frame to the video's real aspect (portrait, landscape, whatever) */
       if(opts.fitAspect){ m.addEventListener('loadedmetadata',()=>{
         if(m.videoWidth && m.videoHeight) mount.style.aspectRatio = m.videoWidth+' / '+m.videoHeight; }); }
-      /* with visible controls, control clicks must not trigger scene nav */
-      if(!ambient){ ['click','pointerdown','mousedown','mouseup','dblclick'].forEach(ev=>m.addEventListener(ev,e=>e.stopPropagation())); }
+      if(!ambient){
+        /* with visible controls, control clicks must not trigger scene nav */
+        ['click','pointerdown','mousedown','mouseup','dblclick'].forEach(ev=>m.addEventListener(ev,e=>e.stopPropagation()));
+      }else{
+        /* tap-to-play fallback: some browsers/settings block muted autoplay and there are no controls */
+        playOverlay=document.createElement('button');
+        playOverlay.className='playbtn'; playOverlay.type='button'; playOverlay.setAttribute('aria-label','Riproduci');
+        playOverlay.innerHTML='<svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+        const sync=()=>{ playOverlay.style.display = m.paused ? '' : 'none'; };
+        ['play','playing','pause','ended','waiting'].forEach(ev=>m.addEventListener(ev,sync));
+        playOverlay.addEventListener('click',e=>{ e.stopPropagation(); m.muted=true; const p=m.play(); if(p&&p.catch)p.catch(()=>{}); });
+        ['pointerdown','mousedown'].forEach(ev=>playOverlay.addEventListener(ev,e=>e.stopPropagation()));
+      }
     }else{
       m=document.createElement('img');
       m.className='media-image'; m.src=url; m.alt=opts.label||'';
     }
     mount.appendChild(m); cur=m;
+    if(playOverlay){ mount.appendChild(playOverlay); playOverlay.style.display = m.paused ? '' : 'none'; }
     if(isObj){
       const note=document.createElement('div');
       note.className='medianote';

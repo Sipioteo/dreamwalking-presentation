@@ -84,16 +84,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 .flowdot{fill:var(--flowdot);opacity:0}
 
 /* ---------- detail panel (screen-space) ---------- */
-#panel{position:fixed;z-index:4;right:3.4vw;top:50%;width:min(40vw,600px);height:auto;max-height:94vh;
+#panel{position:fixed;z-index:4;right:8vw;top:50%;width:min(40vw,600px);height:auto;max-height:94vh;
   overflow-y:auto;scrollbar-width:none;
   display:flex;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;
   transform:translate(26px,-50%);transition:opacity .55s ease,transform .6s cubic-bezier(.2,.7,.2,1),visibility 0s .55s}
 #panel::-webkit-scrollbar{display:none}
 #panel.show{opacity:1;visibility:visible;pointer-events:auto;transform:translate(0,-50%);transition:opacity .55s ease .1s,transform .65s cubic-bezier(.2,.7,.2,1) .1s}
-#panel::before{content:"";position:fixed;right:0;top:0;height:100%;width:50vw;z-index:-1;pointer-events:none;
-  background:linear-gradient(90deg,transparent,rgba(var(--scrim),.72) 36%,rgba(var(--scrim),.93) 62%);
-  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);opacity:0;transition:opacity .5s ease}
-#panel.show::before{opacity:1}
+/* single full-screen blurred scrim behind BOTH detail panels (see #detailscrim) */
+#detailscrim{position:fixed;inset:0;z-index:3;pointer-events:none;
+  background:rgba(var(--scrim),.9);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  opacity:0;visibility:hidden;transition:opacity .5s ease,visibility 0s .5s}
+#detailscrim.show{opacity:1;visibility:visible;transition:opacity .5s ease}
 .phead{border-left:2px solid var(--ac);padding-left:1.1rem;margin-bottom:1rem}
 .pkick{font-family:var(--mono);font-size:clamp(11px,1vw,14px);letter-spacing:.28em;text-transform:uppercase;
   color:var(--ac);display:flex;align-items:center;gap:.7rem}
@@ -115,16 +117,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 .pcount b{color:var(--ac)}
 
 /* ---------- stage visual (screen-space, LEFT) ---------- */
-#stageviz{position:fixed;z-index:4;left:3vw;top:16vh;width:46vw;height:62vh;
+#stageviz{position:fixed;z-index:4;left:6vw;top:16vh;width:44vw;height:62vh;
   display:flex;flex-direction:column;opacity:0;visibility:hidden;pointer-events:none;
   transform:translateX(-22px);
   transition:opacity .55s ease,transform .6s cubic-bezier(.2,.7,.2,1),visibility 0s .55s}
 #stageviz.show{opacity:1;visibility:visible;pointer-events:auto;transform:none;
   transition:opacity .55s ease .1s,transform .65s cubic-bezier(.2,.7,.2,1) .1s}
-#stageviz::before{content:"";position:fixed;left:0;top:0;height:100%;width:54vw;z-index:-1;pointer-events:none;
-  background:linear-gradient(90deg,rgba(var(--scrim),.93) 34%,rgba(var(--scrim),.72) 66%,transparent);
-  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);opacity:0;transition:opacity .5s ease}
-#stageviz.show::before{opacity:1}
+/* left-panel backdrop replaced by the full-screen #detailscrim */
 .stagehead{display:flex;align-items:center;gap:.7rem;margin-bottom:.7rem;
   font-family:var(--mono);font-size:clamp(10px,1vw,12.5px);letter-spacing:.24em;text-transform:uppercase;color:var(--ac)}
 .stagehead .d{width:7px;height:7px;border-radius:50%;background:var(--ac);box-shadow:0 0 10px var(--ac);flex:none}
@@ -181,7 +180,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 .sltitle{font-size:clamp(25px,3.4vw,49px);font-weight:790;letter-spacing:-.025em;line-height:1.03;text-wrap:balance}
 .sllead{font-size:clamp(13px,1.25vw,19px);line-height:1.45;color:var(--ink2);max-width:74ch;margin-top:.6rem;font-weight:350}
 .sllead b{color:var(--ink);font-weight:650}
-.slbody{margin-top:1.25rem}
+.slbody{margin-top:1.9rem}
 .slnote{font-family:var(--mono);font-size:clamp(9.5px,.85vw,12.5px);color:var(--ink3);
   line-height:1.5;letter-spacing:.02em;margin-top:1rem}
 
@@ -199,12 +198,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 .sl-cards{display:flex;flex-wrap:wrap;gap:.75rem;justify-content:center;align-items:stretch}
 .sl-card{flex-grow:1;flex-shrink:1;flex-basis:44%;min-width:0;
   background:rgba(var(--frag-bg),.9);border:1px solid var(--line);border-left:3px solid var(--ac);
-  border-radius:12px;padding:.8rem 1.05rem;
+  border-radius:12px;padding:1.15rem 1.15rem;
   -webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px)}
 .sl-cards[data-n="1"] .sl-card{flex-basis:62%}
 .sl-cards[data-n="3"] .sl-card,.sl-cards[data-n="5"] .sl-card{flex-basis:29%}
-.sl-card .t{font-size:clamp(14px,1.3vw,19px);font-weight:700;color:var(--ink);letter-spacing:-.012em}
-.sl-card .b{font-size:clamp(11.5px,1vw,14.5px);color:var(--ink2);line-height:1.42;margin-top:.26rem}
+.sl-card .t{font-size:clamp(15px,1.42vw,21px);font-weight:700;color:var(--ink);letter-spacing:-.012em}
+.sl-card .b{font-size:clamp(12.5px,1.1vw,16px);color:var(--ink2);line-height:1.46;margin-top:.62rem}
+.sl-card .b b,.sl-card .b strong{color:var(--ink);font-weight:700}
+.sl-card .b ul.sl-ul{margin:.1rem 0 0;padding:0;list-style:none}
+.sl-card .b ul.sl-ul li{position:relative;padding-left:1rem;margin-top:.28rem}
+.sl-card .b ul.sl-ul li:first-child{margin-top:0}
+.sl-card .b ul.sl-ul li::before{content:'▸';position:absolute;left:0;top:-.02em;color:var(--ac);font-size:.9em}
 
 /* layout: stats — big mono numbers */
 .sl-stats{display:flex;flex-wrap:wrap;gap:.9rem;justify-content:center;align-items:stretch}
@@ -316,6 +320,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 <div class="vignette"></div><div class="grain"></div>
 
 <div id="stage"><div id="camera"><!-- world injected --></div></div>
+<div id="detailscrim"></div>
 
 <div class="chrome" id="brand"><span class="d"></span> DreamWalking</div>
 <div class="chrome" id="counter"><b id="cnum">INTRO</b></div>
@@ -325,7 +330,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 </div>
 <div class="chrome" id="clock">00:00</div>
 <div id="progress"><div class="fill" id="pfill"></div></div>
-<div class="hint" id="hint"><span data-act="help">? aiuto</span> &nbsp;·&nbsp; <span data-act="next">→ avanti</span> &nbsp;·&nbsp; <span data-act="map">O mappa</span></div>
+<!-- <div class="hint" id="hint"><span data-act="help">? aiuto</span> &nbsp;·&nbsp; <span data-act="next">→ avanti</span> &nbsp;·&nbsp; <span data-act="map">O mappa</span></div> -->
 
 <div id="overtitle"><div class="t">DreamWalking <span class="em">·</span> la pipeline</div><div class="s">Dal segnale cerebrale all’oggetto 3D · ciclo di co-immaginazione</div></div>
 
@@ -349,21 +354,21 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
   <img class="polito" src="assets/polito-logo.png" width="900" height="450" alt="Politecnico di Torino">
   <div class="kick">Discussione di Laurea Magistrale · A.A. 2025–2026</div>
   <h1>Dream<span class="em">Walking</span></h1>
-  <div class="lead">Decodificare oggetti <b>immaginati</b> dall'<b>EEG</b> in <b class="em">3D interattivo</b>: un <b class="em-r">loop di co-immaginazione</b> uomo-macchina.</div>
+  <div class="lead">Decodificare oggetti <b>immaginati,</b> dall'<b>EEG</b> al <b class="em">3D</b>: un <b class="em-r">loop di co-immaginazione</b> uomo-macchina.</div>
   <div class="authors">
     <div class="a"><b>Matteo Sipione</b><span>candidato</span></div>
     <div class="a"><b>Silvia Bracco</b><span>candidata</span></div>
     <div class="a"><b>A. Sanna · F. Manuri</b><span>relatori</span></div>
-    <div class="a"><b>Politecnico di Torino</b><span>Cinema and Digital Media Engineering</span></div>
+    <div class="a"><b>Politecnico di Torino</b><span>Ingegneria del Cinema e dei Mezzi di Comunicazione</span></div>
   </div>
-  <div class="cta" id="cta" role="button" tabindex="0">→ entra nella pipeline</div>
+  <!-- <div class="cta" id="cta" role="button" tabindex="0">→ entra nella pipeline</div> -->
 </div>
 
 <div class="overlay" id="outro">
   <div class="kick">DreamWalking</div>
   <h1>Un mondo immaginato,<br><span class="em">condiviso.</span></h1>
   <div class="lead">Grazie. Matteo Sipione e Silvia Bracco</div>
-  <div class="title-meta">Politecnico di Torino <span style="color:var(--ink3)">·</span> Cinema and Digital Media Engineering <span style="color:var(--ink3)">·</span> A.A. 2025–2026<br>Relatori: Prof. A. Sanna <span style="color:var(--ink3)">·</span> Prof. F. Manuri</div>
+  <div class="title-meta">Politecnico di Torino <span style="color:var(--ink3)">·</span> Ingegneria del Cinema e dei Mezzi di Comunicazione <span style="color:var(--ink3)">·</span> A.A. 2025–2026<br>Relatori: Prof. A. Sanna <span style="color:var(--ink3)">·</span> Prof. F. Manuri</div>
 </div>
 
 <div class="overlay slideview accent-cyan" id="slide">
@@ -400,13 +405,12 @@ const SLIDES = [
   /* ---------------------------------------------------------------- AGENDA */
   { id:'agenda', phase:'pre', presenter:'m', accent:'cyan',
     kicker:'Scaletta',
-    title:'Di cosa parliamo',
     lead:'',
     layout:'list',
     items:[
-      { n:'01', t:'Contesto e obiettivi',              b:'Da dove nasce la domanda e cosa ci siamo proposti.' },
-      { n:'02', t:'Stato dell’arte',                   b:'Cosa si sa già fare, e i tre muri che restano.' },
-      { n:'03', t:'Le tecnologie essenziali',          b:'Le poche idee che servono per seguire il resto.' },
+      { n:'01', t:'Contesto e obiettivi',              b:'Cosa ci siamo proposti.' },
+      { n:'02', t:'Stato dell’arte',                   b:'Cosa si sa già fare e i tre ostacoli che restano.' },
+      { n:'03', t:'Le tecnologie essenziali',          b:'Fondamenti per orientarsi.' },
       { n:'04', t:'La pipeline: design e implementazione', b:'I nove blocchi del sistema, dal segnale all’oggetto.' },
       { n:'05', t:'Demo',                              b:'Il sistema in funzione.' },
       { n:'06', t:'Risultati',                         b:'Cosa dicono i dati, compreso ciò che non ha funzionato.' },
@@ -417,58 +421,57 @@ const SLIDES = [
   /* ----------------------------------------------------------------- GOALS */
   { id:'goals', phase:'pre', presenter:'m', accent:'cyan',
     kicker:'Contesto e obiettivi',
-    title:'Ricostruire un oggetto immaginato, senza uno scanner',
-    lead:'Il filo conduttore: il modello propone, l’utente nomina, il sistema impara.',
+    title:'Ricostruire un oggetto immaginato senza fMRI',
     layout:'cards',
     items:[
+      { t:'Lo stato attuale',
+        b:'Ricostruire ciò che una persona vede a partire dal cervello oggi è possibile, con la fMRI (<b>Risonanza Magnetica Funzionale</b>): il dispositivo è fisso e costoso, genera un campo magnetico forte e impone che il soggetto rimanga immobile.' },
       { t:'Il problema',
-        b:'Ricostruire ciò che una persona vede a partire dal cervello oggi funziona, ma con la fMRI (risonanza magnetica funzionale): uno scanner fisso, un campo magnetico forte, il soggetto immobile.' },
-      { t:'La scommessa',
-        b:'L’EEG (elettroencefalografia) è economico, portatile e preciso nel tempo, ma ha bassa risoluzione nello spazio e un segnale molto più rumoroso.' },
+        b:'I dispositivi per <b>EEG (elettroencefalogramma)</b> sono economici e portatili, ma hanno bassa risoluzione spaziale e un segnale molto più rumoroso.' },
       { t:'La domanda di partenza',
         b:'Dato l’EEG registrato mentre una persona immagina un oggetto, il sistema può produrne una resa tridimensionale?' },
-      { t:'Obiettivi: un encoder per qualunque casco',
-        b:'I dataset vanno da 2 a 128 elettrodi: un modello legato a un numero fisso di canali non si trasferisce. Serve un encoder che accetti qualunque montaggio.' },
-      { t:'Obiettivi: una sola lingua, un oggetto reale, un ciclo',
-        b:'Far parlare all’EEG la stessa lingua del generatore 3D senza traduttori; ancorare la stima rumorosa a un oggetto vero pescato da un catalogo; chiudere il ciclo di co-immaginazione mostrando l’incertezza in realtà virtuale.' },
+      { t:'Obiettivo 1: un solo encoder per caschi diversi', accent:'amber',
+        b:['I dataset sono montati con sistemi <b>da 2 a 128 elettrodi</b>: serve un encoder che accetti qualunque montaggio.' ]},
+      { t:'Obiettivo 2: creare un ciclo', accent:'amber',
+        b:[['Far parlare all’EEG la <b>stessa lingua</b> del generatore 3D (senza traduttori);' ], ['associare la stima rumorosa a un oggetto presente in un <b>catalogo</b>;'], ['chiudere il <b>ciclo di co-immaginazione</b> mostrando l’incertezza in realtà virtuale.']]},
     ],
-    note:'Non una decodifica in un colpo solo: modello e utente si adattano a vicenda.' },
+    },
 
   /* ----------------------------------------------------------------- SOTA 1 */
   { id:'sota1', phase:'pre', presenter:'s', accent:'amber',
     kicker:'Stato dell’arte · 1',
-    title:'Leggere il cervello si sa fare. Ma con una macchina non indossabile, e in due dimensioni',
+    title:'Leggere il cervello è possibile. Ma con una macchina non indossabile, e in due dimensioni',
     lead:'',
     layout:'cards',
     items:[
-      { t:'Con la fMRI i numeri sono altissimi',
-        b:'MindEye (2023) ricostruisce l’immagine osservata con il 93,8% di successo sulla prima della lista; MindEye2 (2024) con il 92,1%. Entrambi leggono la fMRI.' },
+      { t:'Con la fMRI i risultati sono ottimi',
+        b:'<b>MindEye (2023)</b> ricostruisce l’immagine osservata con il 93,8% di successo sulla prima della lista; <b>MindEye2 (2024)</b> con il 92,1%. Entrambi leggono la fMRI.' },
       { t:'Con l’EEG i numeri crollano',
-        b:'Su THINGS-EEG2, NICE-EEG (2024) si ferma al 15,6% e ATM (2024) al 21,1%, contro uno 0,5% del caso.' },
+        b:'Su THINGS-EEG2, <b>NICE-EEG (2024)</b> si ferma al 15,6% e <b>ATM (2024)</b> al 21,1%, contro uno 0,5% del caso.' },
       { t:'Non è un difetto dei sistemi EEG',
         b:'Il divario fra 93,8% e 15-21% riflette la differenza di risoluzione spaziale fra le due misure, non un limite della strumentazione EEG.' },
       { t:'Tutti si fermano a due dimensioni',
-        b:'DreamDiffusion (2023) e ATM producono immagini piatte; NICE-EEG recupera fotografie. Nessuno arriva a un oggetto tridimensionale.' },
+        b:'<b>DreamDiffusion (2023)</b> e <b>ATM</b> producono immagini piatte; <b>NICE-EEG</b> recupera fotografie. Nessuno arriva a un oggetto tridimensionale.' },
       { t:'Tutti puntano allo stesso bersaglio',
-        b:'Ogni lavoro allinea il cervello a CLIP, il modello immagine-testo di OpenAI. Questa tesi sceglie invece DINOv2, perché è già la lingua del generatore 3D.' },
-    ],
+        b:[['Ogni lavoro allinea il cervello a <b>CLIP</b>, il modello immagine-testo di OpenAI.'], ['Questa tesi sceglie invece <b>DINOv2</b>, perché è già la lingua del generatore 3D.' ]],
+  }],
     note:'' },
 
   /* ----------------------------------------------------------------- SOTA 2 */
   { id:'sota2', phase:'pre', presenter:'s', accent:'amber',
     kicker:'Stato dell’arte · 2',
-    title:'Perché con l’EEG nessuno l’ha ancora fatto: i tre muri',
+    title:'Perché con l’EEG nessuno l’ha ancora fatto',
     lead:'',
     layout:'cards',
     items:[
-      { t:'Muro 1 — i modelli fondazionali EEG non gestiscono montaggi nuovi',
-        b:'BENDR (2022), Neuro-GPT e Brant lavorano su un numero fisso di canali; BIOT (2023) e LaBraM (2024) riconoscono gli elettrodi dal nome. Nessuno riporta il segnale su un substrato condiviso prima di codificarlo: davanti a un casco mai visto non generalizzano.' },
-      { t:'Muro 2 — la generalizzazione tra soggetti',
-        b:'Quasi tutti i lavori valutano sullo stesso soggetto su cui hanno addestrato. Su una persona nuova la prestazione crolla, spesso fino al livello del caso.' },
-      { t:'Muro 3 — i generatori 3D non parlano la lingua giusta',
-        b:'NeRF impiega ore, 3D Gaussian Splatting minuti, TripoSR meno di mezzo secondo, Trellis circa cinque: nessuno di questi accetta in ingresso le feature di DINOv2.' },
+      { t:'Ostacolo 1: i modelli fondazionali EEG non gestiscono montaggi nuovi',
+        b:[['<b>BENDR (2022)</b>, <b>Neuro-GPT</b> e <b>Brant</b> lavorano su un numero fisso di canali; <b>BIOT (2023)</b> e <b>LaBraM (2024)</b> riconoscono gli elettrodi dal nome.'],['Nessuno riporta il segnale su un substrato condiviso prima di codificarlo: davanti a un casco mai visto non generalizzano.']] },
+      { t:'Ostacolo 2: la generalizzazione tra soggetti',
+        b:'Quasi tutti i lavori valutano sullo <b>stesso soggetto</b> su cui hanno addestrato. Su una persona nuova la prestazione crolla, spesso fino al livello del caso.' },
+      { t:'Ostacolo 3: i generatori 3D non parlano la lingua giusta',
+        b:'<b>NeRF</b> impiega ore, <b>3D Gaussian Splatting</b> minuti, <b>TripoSR</b> meno di mezzo secondo, <b>Trellis</b> circa cinque: nessuno di questi accetta in ingresso le feature di <b>DINOv2</b>.' },
       { t:'L’eccezione che rende possibile il progetto',
-        b:'Hunyuan3D 2.1 (2025) produce una forma in 2-3 secondi e si condiziona direttamente su DINOv2. Per questo è stato adottato.' },
+        b:'<b>Hunyuan3D 2.1 (2025)</b> produce una forma in 2-3 secondi e si condiziona direttamente su <b>DINOv2</b>. Per questo è stato adottato.' },
       { t:'Il vuoto che la tesi riempie',
         b:'Nessun lavoro di decodifica EEG sfrutta il fatto che un generatore 3D possa condividere lo spazio di rappresentazione con un encoder visivo; e, a nostra conoscenza, nessun lavoro pubblicato mappa direttamente l’EEG di superficie su ricostruzioni tridimensionali.' },
     ],
@@ -477,16 +480,15 @@ const SLIDES = [
   /* ----------------------------------------------------------------- TECH 1 */
   { id:'tech1', phase:'pre', presenter:'m', accent:'violet',
     kicker:'Tecnologie · 1',
-    title:'Le idee che servono: il segnale e lo spazio visivo',
-    lead:'Cinque definizioni in una riga, poi il sistema si legge da solo.',
+    title:'Concetti fondamentali: il segnale e lo spazio visivo',
     layout:'cards',
     items:[
       { t:'EEG (elettroencefalografia)',
-        b:'Misura dall’esterno del cranio i minuscoli sbalzi di tensione (10-100 µV) prodotti da migliaia di neuroni che si attivano insieme. È l’ingresso del sistema: economico e portatile, al contrario della fMRI.' },
+        b:'Misura dall’esterno del cranio piccole differenze di tensione (10-100 µV) prodotte da <b>neuroni</b> che si attivano contemporaneamente. È l’ingresso del sistema: <b>economico e portatile</b>, al contrario della fMRI.' },
       { t:'Come si collega un casco: LSL e sistema 10-5',
-        b:'LSL (Lab Streaming Layer) è uno standard aperto che fa trasmettere i campioni, sincronizzati, da qualunque amplificatore. Il sistema 10-5 è lo standard che nomina le posizioni degli elettrodi: dalle 19 posizioni del 10-20 si arriva a circa 340.' },
+        b:[['<b>LSL (Lab Streaming Layer)</b> è uno standard aperto che permette di trasmettere i campioni, sincronizzati, da qualunque amplificatore.'],[' Il <b>sistema 10-5</b> è lo standard per il posizionamento degli elettrodi: 345 elettrodi distanziati a intervalli del <b>10%</b> e del <b>5%</b> lungo la circonferenza cranica.']] },
       { t:'Spazio latente ed embedding',
-        b:'Una rete trasforma un dato — un’immagine, un tracciato EEG — in un embedding, cioè una lista di numeri che rappresenta il concetto. In quella mappa i concetti simili finiscono vicini. È l’idea che regge tutta la tesi.' },
+        b:[['Una rete trasforma un dato (come un’immagine o un tracciato EEG) in un <b>embedding</b>, cioè una lista di numeri che rappresenta il concetto.'],[' In quella mappa, <b>concetti simili finiscono vicini</b>. È l’idea che regge tutta la tesi.']] },
       { t:'DINOv2',
         b:'Un modello di visione addestrato su 142 milioni di immagini senza etichette e senza linguaggio: organizza lo spazio per pura apparenza visiva. È l’unico bersaglio di allineamento, perché è già l’interfaccia del generatore 3D.' },
       { t:'Il vettore riassunto dell’immagine',
@@ -497,7 +499,7 @@ const SLIDES = [
   /* ----------------------------------------------------------------- TECH 2 */
   { id:'tech2', phase:'pre', presenter:'s', accent:'violet',
     kicker:'Tecnologie · 2',
-    title:'Le idee che servono: il catalogo, la forma, l’adattamento',
+    title:'Concetti fondamentali: il catalogo, la forma, l’adattamento',
     lead:'',
     layout:'cards',
     items:[
@@ -506,9 +508,9 @@ const SLIDES = [
       { t:'FAISS e la ricerca del vicino più prossimo',
         b:'Una libreria di ricerca per somiglianza: in un archivio enorme di vettori trova rapidamente quello più simile alla richiesta, in meno di 30 millesimi di secondo su processore. Serve ad ancorare una stima rumorosa a un oggetto reale.' },
       { t:'Hunyuan3D 2.1 (e HunyuanDiT)',
-        b:'Da una fotografia produce una forma tridimensionale in 2-3 secondi, condizionandosi direttamente sulle feature DINOv2: nessun adattatore. HunyuanDiT, della stessa famiglia, fa il percorso inverso: da una parola produce un’immagine.' },
-      { t:'LoRA (adattamento a basso rango)',
-        b:'Invece di riaddestrare tutto il modello, si aggiungono due piccole matrici (rango 16) e si aggiornano solo quelle: il resto resta congelato. Serve a personalizzare sul singolo utente, con un aggiornamento di 1-3 secondi.' },
+        b:'Il primo, da una fotografia produce una forma tridimensionale in 2-3 secondi, condizionandosi direttamente sulle feature DINOv2 senza adattatori. HunyuanDiT, della stessa famiglia, fa il percorso inverso: da una parola produce un’immagine.' },
+      { t:'LoRA (Low-Rank Adaptation)',
+        b:'Invece di riaddestrare tutto il modello, si aggiungono due piccole matrici (rango 16) e si aggiornano solo quelle: il resto resta congelato. Serve a personalizzare il modello sul singolo utente.' },
       { t:'Rendering volumetrico e realtà virtuale',
         b:'L’oggetto appare come una nuvola di particelle in cui la densità rappresenta la confidenza del modello. Rende l’incertezza visibile invece di nasconderla: è una scelta rappresentazionale, non estetica.' },
     ],
@@ -575,7 +577,7 @@ const SLIDES = [
 const WORLD = { w: 4000, h: 2400 };
 
 const BLOCKS = [
-  { id:'eeg',       n:'01', presenter:'m', accent:'cyan',   x: 320,  y: 560,  w: 380, h: 220,
+  { id:'eeg',       n:'01', presenter:'m', accent:'cyan',   x: 360,  y: 560,  w: 380, h: 220,
     title:'Acquisizione del segnale cerebrale', tag:'Acquisizione', oneLiner:'L’utente immagina, l’amplificatore ascolta la corteccia.', steps:[
       { t:'Immaginare, non guardare', b:'L’amplificatore indossabile registra l’attività della corteccia mentre l’utente immagina l’oggetto, senza averlo davanti.' },
       { t:'Qualunque casco, tramite LSL', b:'Ogni amplificatore si collega con LSL: dal g.HIamp a 64 canali all’Emotiv Insight 2 a 5 canali.' },
@@ -591,7 +593,7 @@ const BLOCKS = [
       { t:'Bersagli graduati', b:'In addestramento mostriamo all’encoder molti esempi in blocco, chiedendogli di avvicinare quello giusto e allontanare gli altri. Ma se nel blocco ci sono due mele, il criterio standard le tratterebbe come sbagliate l’una per l’altra. Noi diamo a ogni esempio un grado di correttezza proporzionale a quanto i concetti si somigliano davvero: così il modello impara la struttura semantica condivisa invece di memorizzare i singoli stimoli.' },
       { t:'Un primo componente, sostituibile', b:'L’aspettativa era che l’encoder portasse nella zona giusta della mappa. Empiricamente non regge: l’encoder congelato collassa il segnale di immaginazione e fa peggio di una semplice mappa lineare. Lo presentiamo come primo componente sostituibile e come risultato negativo documentato, non come contributo validato.' },
     ] },
-  { id:'retrieval', n:'03', presenter:'m', accent:'cyan',   x: 1840, y: 560,  w: 400, h: 220,
+  { id:'retrieval', n:'03', presenter:'m', accent:'cyan',   x: 1800, y: 560,  w: 400, h: 220,
     title:'Ricerca nel catalogo visivo · FAISS', tag:'Recupero', oneLiner:'Al generatore diamo una fotografia vera, non il vettore.', steps:[
       { t:'Perché cercare invece di generare', b:'Al generatore 3D non diamo il vettore stimato dall’EEG, che è rumoroso. Gli diamo una fotografia vera, pescata da un catalogo di immagini reali.' },
       { t:'Tre vantaggi', b:'Robustezza: al vettore basta finire nel quartiere giusto, al resto pensa il catalogo, e un problema di sintesi mal posto diventa un problema di indicizzazione ben posto. Leggibilità: l’utente vede subito un’immagine e una parola, e capisce cosa il sistema ha creduto di leggere. Qualità: da una fotografia pulita i generatori producono forme migliori che da un vettore rumoroso.' },
@@ -599,7 +601,7 @@ const BLOCKS = [
       { t:'Meno di trenta millesimi di secondo', b:'Tutte le impronte hanno lunghezza uno. Quando le lunghezze sono fissate, misurare quanto due concetti si somigliano si riduce a una moltiplicazione: un’operazione elementare, che il processore fa in un lampo. Per questo cercare fra quattordici milioni richiede meno di trenta millesimi di secondo, senza nemmeno una scheda grafica.' },
       { t:'La prima della lista, subito', b:'L’impronta che esce dall’EEG diventa una domanda al catalogo: trovami l’immagine che ti somiglia di più. Il sistema restituisce la prima della lista — la fotografia, la parola che la descrive e un punteggio di somiglianza — e la mostra all’utente mentre l’oggetto 3D è ancora in costruzione. Un’ipotesi leggibile in pochi millesimi di secondo, invece di due o tre secondi davanti a una scena vuota.' },
     ] },
-  { id:'gen',       n:'04', presenter:'s', accent:'cyan',   x: 2600, y: 560,  w: 380, h: 220,
+  { id:'gen',       n:'04', presenter:'s', accent:'cyan',   x: 2520, y: 560,  w: 380, h: 220,
     title:'Generazione della forma 3D · Hunyuan3D', tag:'Generazione 3D', oneLiner:'Dalla fotografia recuperata a una forma solida.', steps:[
       { t:'Da immagine a oggetto', b:'Hunyuan3D 2.1 riceve la fotografia recuperata dal catalogo e ne ricava una forma tridimensionale.' },
       { t:'Non il vettore, l’immagine', b:'Il generatore è condizionato dall’immagine reale, non dall’impronta stimata dall’EEG: parte da un ingresso pulito.' },
@@ -607,7 +609,7 @@ const BLOCKS = [
       { t:'Un oggetto alla volta', b:'Il risultato è un singolo oggetto 3D, generato uno alla volta e pronto per essere mostrato in realtà virtuale.' },
       { t:'Il collo di bottiglia', b:'La sintesi richiede 2-3 secondi: è il punto più lento di tutta la catena, e la ragione per cui la fotografia viene mostrata prima.' },
     ] },
-  { id:'render',    n:'05', presenter:'m', accent:'rose',   x: 3360, y: 560,  w: 400, h: 220,
+  { id:'render',    n:'05', presenter:'m', accent:'rose',   x: 3240, y: 560,  w: 400, h: 220,
     title:'Visualizzazione volumetrica', tag:'Stato di sogno', oneLiner:'L’incertezza si vede: nuvola che diventa superficie.', steps:[
       { t:'L’incertezza si vede', b:'L’oggetto appare in realtà virtuale come una nuvola di particelle, non come un solido già finito.' },
       { t:'La densità è la confidenza', b:'Dove il modello è sicuro la nuvola si infittisce fino a solidificarsi in superficie; dove è incerto resta rarefatta.' },
@@ -615,7 +617,7 @@ const BLOCKS = [
       { t:'Il motore', b:'La scena gira in Unreal Engine 5 e viene indossata con il Meta Quest 3.' },
       { t:'Anteprima progressiva: percorso sperimentale', b:'Un percorso guidato sperimentale mostra l’oggetto mentre cresce: 5000 punti campionati su una griglia 32³, trasmessi in streaming con la camera che orbita. Il sistema a regime non lo usa: riceve direttamente la forma finale.' },
     ] },
-  { id:'feedback',  n:'06', presenter:'s', accent:'rose',   x: 3360, y: 1560, w: 400, h: 220,
+  { id:'feedback',  n:'06', presenter:'s', accent:'rose',   x: 3240, y: 1360, w: 400, h: 220,
     title:'Riscontro dell’utente · catena della verità', tag:'Nominare è confermare', oneLiner:'Nominare è insieme comunicare e supervisionare.', steps:[
       { t:'Nominare è confermare', b:'Pronunciare il nome dell’oggetto è al tempo stesso un atto comunicativo e il segnale di supervisione che il sistema aspetta.' },
       { t:'Dalla parola all’immagine', b:'La parola diventa una richiesta a HunyuanDiT, che ne produce un’immagine di riferimento: la verità di quel momento.' },
@@ -623,7 +625,7 @@ const BLOCKS = [
       { t:'La coppia di calibrazione', b:'La coppia formata dalla verità e dall’ipotesi del sistema viene salvata su disco come dato di calibrazione.' },
       { t:'Il ciclo si chiude', b:'Il sistema non è un decodificatore in un colpo solo: impara dal nome pronunciato. Il modello propone, l’utente nomina, il sistema impara.' },
     ] },
-  { id:'arbiter',   n:'07', presenter:'m', accent:'amber',  x: 2560, y: 1720, w: 400, h: 220,
+  { id:'arbiter',   n:'07', presenter:'m', accent:'amber',  x: 2520, y: 1360, w: 400, h: 220,
     title:'Somiglianza fra vettori · l’arbitro', tag:'Arbitro', oneLiner:'La somiglianza decide: solidificare o rigenerare.', steps:[
       { t:'Quanto ci siamo andati vicino', b:'Si misura la somiglianza fra la verità e l’ipotesi: un numero fra -1 e 1 che dice quanto due impronte puntano nella stessa direzione. Quel numero viene confrontato con una soglia θ.' },
       { t:'Se la somiglianza è alta', b:'L’oggetto si solidifica, il bersaglio per l’addestramento è l’impronta dell’immagine recuperata e il catalogo resta com’è.' },
@@ -631,7 +633,7 @@ const BLOCKS = [
       { t:'In ogni caso si impara', b:'In entrambi i casi la coppia formata dal segnale EEG e dall’impronta finisce nell’archivio degli esempi.' },
       { t:'Il passaggio automatico non è ancora cablato', b:'La somiglianza è già calcolata ed esposta come confidenza, ma la decisione automatica sulla soglia θ non è ancora collegata: oggi a decidere è il nome pronunciato dall’utente.' },
     ] },
-  { id:'trainer',   n:'08', presenter:'s', accent:'violet', x: 1560, y: 1720, w: 400, h: 220,
+  { id:'trainer',   n:'08', presenter:'s', accent:'violet', x: 1080, y: 1360, w: 400, h: 220,
     title:'Addestramento LoRA · archivio degli esempi', tag:'Adattamento', oneLiner:'Ogni conferma aggiorna il modello personale dell’utente.', steps:[
       { t:'Solo due piccole matrici', b:'Si aggiunge un adattatore LoRA di rango 16 sopra la testa di DINOv2: tutto il resto della rete resta congelato.' },
       { t:'Un archivio per ogni utente', b:'Ogni utente ha il suo archivio di coppie formate dal segnale EEG e dal bersaglio; a ogni conferma il modello si aggiorna su tutte le coppie raccolte.' },
@@ -639,7 +641,7 @@ const BLOCKS = [
       { t:'Personalizzazione isolata', b:'L’adattamento personalizza il modello senza toccare i pesi pre-addestrati condivisi con gli altri utenti.' },
       { t:'Un aggiornamento in pochi secondi', b:'L’aggiornamento richiede 1-3 secondi: abbastanza rapido da restare dentro la sessione.' },
     ] },
-  { id:'dbupdate',  n:'+',  presenter:'m', accent:'violet', x: 720,  y: 1560, w: 380, h: 220,
+  { id:'dbupdate',  n:'+',  presenter:'m', accent:'violet', x: 1800, y: 1360, w: 380, h: 220,
     title:'Aggiornamento del catalogo', tag:'Catalogo', oneLiner:'Il catalogo cresce a ogni ipotesi respinta.', steps:[
       { t:'Un catalogo vivo', b:'Il catalogo su cui si fa la ricerca non è statico: cresce con l’uso del sistema.' },
       { t:'Si aggiunge solo quando si sbaglia', b:'Una nuova voce nasce soltanto quando l’ipotesi viene respinta: si salvano l’impronta della verità, la sua immagine e la parola.' },
@@ -656,12 +658,12 @@ const EDGES = [
   { from:'encoder',   to:'retrieval', kind:'solid',  curve:'straight', label:'impronta · 1536 numeri' },
   { from:'retrieval', to:'gen',       kind:'solid',  curve:'straight', label:'immagine recuperata' },
   { from:'gen',       to:'render',    kind:'solid',  curve:'straight', label:'oggetto 3D → realtà virtuale' },
-  { from:'render',    to:'feedback',  kind:'solid',  curve:'down',     label:'utente nomina' },
+  { from:'render',    to:'feedback',  kind:'solid',  curve:'straight', label:'utente nomina' },
   { from:'feedback',  to:'arbiter',   kind:'solid',  curve:'straight', label:'verità contro ipotesi' },
-  { from:'arbiter',   to:'trainer',   kind:'solid',  curve:'straight', label:'(EEG, impronta) → archivio' },
-  { from:'arbiter',   to:'dbupdate',  kind:'solid',  curve:'down',     label:'s<θ · nuova voce' },
-  { from:'trainer',   to:'encoder',   kind:'dashed', curve:'up',       label:'aggiornamento pesi LoRA' },
-  { from:'dbupdate',  to:'retrieval', kind:'dashed', curve:'up',       label:'catalogo aggiornato' },
+  { from:'arbiter',   to:'trainer',   kind:'solid',  curve:'down',     label:'(EEG, impronta) → archivio' },
+  { from:'arbiter',   to:'dbupdate',  kind:'solid',  curve:'straight', label:'s<θ · nuova voce' },
+  { from:'trainer',   to:'encoder',   kind:'dashed', curve:'straight', label:'aggiornamento pesi LoRA' },
+  { from:'dbupdate',  to:'retrieval', kind:'dashed', curve:'straight', label:'catalogo aggiornato' },
 ];
 /* === DATA:END === */
 
@@ -679,7 +681,7 @@ const EDGES = [
    never touched; the circuit geometry is unchanged.
    Verified: no node overlaps, no label collisions, every wire/label inside the
    fitted box at 1280×720 / 1600×900 / 1920×1080. */
-const NODE_SCALE = { w: 1.18, h: 1.38 };
+const NODE_SCALE = { w: 1.24, h: 1.44 };
 BLOCKS.forEach(b=>{ b.w=Math.round(b.w*NODE_SCALE.w); b.h=Math.round(b.h*NODE_SCALE.h); });
 
 /* ---- theming: two resolved palettes, active one chosen at runtime ---- */
@@ -955,6 +957,7 @@ function updatePanel(sc){
   const show = sc.kind==='block';
   panel.classList.toggle('show', show);
   stageviz.classList.toggle('show', show);
+  document.getElementById('detailscrim').classList.toggle('show', show);
   if(!show){ panelBlock=-1; teardownViz(); return; }
   const b=BLOCKS[sc.bi];
   if(panelBlock!==sc.bi){
@@ -968,8 +971,8 @@ function updatePanel(sc){
     mountViz(b.id, b, HEX[b.accent]);
     pkick.textContent = `${b.n} · ${b.tag}`;
     ptitle.textContent = b.title;
-    ptag.textContent = b.presenter==='m' ? 'Matteo' : 'Silvia';
-    ptag.className = 'ptag'+(b.presenter==='s'?' silvia':'');
+    ptag.textContent = '';
+    ptag.style.display = 'none';   /* speaker name hidden in the detail panels */
     psteps.innerHTML = b.steps.map(st=>`<div class="frag"><div class="ft">${esc(st.t)}</div><div class="fb">${esc(st.b)}</div></div>`).join('');
     stepEls=[...psteps.children];
   }
@@ -979,6 +982,16 @@ function updatePanel(sc){
 
 /* ---- linear content slides ---- */
 let slideShown=-1;
+/* Card / row body renderer. Accepts:
+     - a string  → rendered as raw HTML, so <b>…</b>, <i>…</i>, <br> etc. work
+     - an array  → rendered as a bulleted list (each entry is itself raw HTML)
+   Passing HTML is intentional: this is trusted, author-written slide content. */
+function cardBody(b){
+  if(b==null||b==='') return '';
+  if(Array.isArray(b)) return `<div class="b"><ul class="sl-ul">`+
+    b.map(x=>`<li>${x}</li>`).join('')+`</ul></div>`;
+  return `<div class="b">${b}</div>`;
+}
 function slideItems(s){
   const items=(s.items||[]), n=items.length;   /* render every item: never silently drop content */
   if(s.layout==='list') return `<div class="sl-list">`+items.map(it=>
@@ -989,9 +1002,13 @@ function slideItems(s){
     `<div class="sl-stat"><div class="v">${esc(it.v||'')}</div>`+
     `<div class="t">${esc(it.t||'')}</div>`+(it.b?`<div class="b">${esc(it.b)}</div>`:'')+
     `</div>`).join('')+`</div>`;
-  return `<div class="sl-cards" data-n="${n}">`+items.map(it=>
-    `<div class="sl-card"><div class="t">${esc(it.t||'')}</div>`+
-    (it.b?`<div class="b">${esc(it.b)}</div>`:'')+`</div>`).join('')+`</div>`;
+  return `<div class="sl-cards" data-n="${n}">`+items.map(it=>{
+    /* per-card accent override: it.accent can be a palette name (cyan/rose/amber/violet)
+       or a raw hex like '#ff8800'. Falls back to the slide's accent when absent. */
+    const acc = it.accent ? ` style="--ac:${it.accent[0]==='#'?it.accent:'var(--'+it.accent+')'}"` : '';
+    return `<div class="sl-card"${acc}><div class="t">${esc(it.t||'')}</div>`+
+    cardBody(it.b)+`</div>`;
+  }).join('')+`</div>`;
 }
 function updateSlide(sc){
   const show = sc.kind==='slide';
@@ -1090,9 +1107,12 @@ outroEl.addEventListener('click', e=>{ if(e.clientX < innerWidth*0.28) prev(); e
 slideEl.addEventListener('click', e=>{ if(e.clientX < innerWidth*0.28) prev(); else next(); });
 /* action texts are real buttons (they sit in the left "back" zone, so give them explicit actions) */
 const ctaEl=document.getElementById('cta');
-ctaEl.addEventListener('click', e=>{ e.stopPropagation(); next(); });
-ctaEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); e.stopPropagation(); next(); } });
-document.getElementById('hint').addEventListener('click', e=>{ const a=e.target.closest('[data-act]'); if(!a) return; e.stopPropagation();
+if(ctaEl){
+  ctaEl.addEventListener('click', e=>{ e.stopPropagation(); next(); });
+  ctaEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); e.stopPropagation(); next(); } });
+}
+const hintEl=document.getElementById('hint');
+if(hintEl) hintEl.addEventListener('click', e=>{ const a=e.target.closest('[data-act]'); if(!a) return; e.stopPropagation();
   const act=a.dataset.act; if(act==='next') next(); else if(act==='map') go(idxOfOverview()); else if(act==='help') document.getElementById('help').classList.toggle('on'); });
 demoEl.addEventListener('click', e=>{ if(e.clientX < innerWidth*0.28) prev(); else next(); });
 panel.addEventListener('click', e=>{ if(e.clientX < innerWidth*0.28) prev(); else next(); });
@@ -1114,7 +1134,7 @@ setInterval(()=>{
   c.classList.remove('warn','over');
   if(s>26*60) c.classList.add('over'); else if(s>23*60) c.classList.add('warn');
 },1000);
-setTimeout(()=>{ document.getElementById('hint').style.opacity=0; }, 7000);
+setTimeout(()=>{ const h=document.getElementById('hint'); if(h) h.style.opacity=0; }, 7000);
 
 /* =========================================================================
    PARTICLE FIELD (curl-noise-ish) + FLOW DOTS

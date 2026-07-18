@@ -111,7 +111,21 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
   border-radius:12px;padding:.68rem 1rem;-webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px)}
 .frag.on{opacity:1;transform:none;filter:none}
 .ft{font-size:clamp(15px,1.35vw,19px);font-weight:680;color:var(--ink);letter-spacing:-.01em}
-.fb{font-size:clamp(13px,1.05vw,15px);color:var(--ink2);line-height:1.38;margin-top:.22rem}
+.fb{font-size:clamp(13px,1.05vw,15px);color:var(--ink2);line-height:1.38;margin-top:.45rem}
+/* Bodies accept inline markup (<b>, <em>, <br>) exactly like the slide cards. */
+.fb b,.fb strong,.fb-ul b,.fb-ul strong{color:var(--ink);font-weight:700}
+/* A step body can be a list. Bullets carry the same reveal animation as .frag so
+   a single card can uncover its points one at a time. */
+.fb-ul{list-style:none;margin:.45rem 0 0;padding:0}
+.fb-ul li{position:relative;padding-left:1rem;margin-top:.3rem;
+  font-size:clamp(13px,1.05vw,15px);color:var(--ink2);line-height:1.38;
+  opacity:0;transform:translateY(8px);filter:blur(2px);
+  transition:opacity .45s ease,transform .5s cubic-bezier(.2,.7,.2,1),filter .45s ease}
+.fb-ul li:first-child{margin-top:0}
+.fb-ul li::before{content:'▸';position:absolute;left:0;top:-.02em;color:var(--ac);font-size:.9em}
+.fb-ul li.on{opacity:1;transform:none;filter:none}
+/* A card may omit its title: the body then sits flush at the top. */
+.frag > .fb:first-child,.frag > .fb-ul:first-child{margin-top:0}
 .pcount{font-family:var(--mono);font-size:12.5px;color:var(--ink3);letter-spacing:.16em;
   margin-top:.75rem;text-align:right}
 .pcount b{color:var(--ac)}
@@ -291,6 +305,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 #counter{right:var(--edge);top:3.4vh;color:var(--ink2)}
 #counter b{color:var(--cyan)}
 #who{left:var(--edge);bottom:3.2vh;display:flex;align-items:center;gap:.7rem}
+#who.hide{display:none}   /* speaker tags are suppressed on the title slide */
 #who .tag{padding:.28rem .7rem;border-radius:20px;border:1px solid var(--line);text-transform:uppercase}
 #who .tag.act{color:var(--tag-ink);background:var(--cyan);border-color:var(--cyan);font-weight:700}
 #who .tag.silvia.act{background:var(--rose);border-color:var(--rose)}
@@ -409,7 +424,7 @@ const SLIDES = [
     layout:'list',
     items:[
       { n:'01', t:'Contesto e obiettivi',              b:'Cosa ci siamo proposti.' },
-      { n:'02', t:'Stato dell’arte',                   b:'Cosa si sa già fare e i tre ostacoli che restano.' },
+      { n:'02', t:'Stato dell’arte',                   b:'Cosa si sa già fare e i tre ostacoli.' },
       { n:'03', t:'Le tecnologie essenziali',          b:'Fondamenti per orientarsi.' },
       { n:'04', t:'La pipeline: design e implementazione', b:'I nove blocchi del sistema, dal segnale all’oggetto.' },
       { n:'05', t:'Demo',                              b:'Il sistema in funzione.' },
@@ -504,13 +519,13 @@ const SLIDES = [
     layout:'cards',
     items:[
       { t:'ImageNet-21k, il catalogo',
-        b:'Circa 14 milioni di fotografie in 21.000 categorie. Il vantaggio non è la quantità in sé, ma la diversità dentro ogni singolo concetto.' },
+        b:'Circa <b>14 milioni</b> di fotografie in <b>21.000 categorie</b>. Il vantaggio non è la quantità in sé, ma la diversità dentro ogni singolo concetto.' },
       { t:'FAISS e la ricerca del vicino più prossimo',
-        b:'Una libreria di ricerca per somiglianza: in un archivio enorme di vettori trova rapidamente quello più simile alla richiesta, in meno di 30 millesimi di secondo su processore. Serve ad ancorare una stima rumorosa a un oggetto reale.' },
+        b:'Una libreria di ricerca per somiglianza: in un archivio enorme di vettori trova rapidamente quello più simile alla richiesta, in meno di <b>30 millesimi di secondo</b> su processore. Serve ad ancorare una stima rumorosa a un oggetto reale.' },
       { t:'Hunyuan3D 2.1 (e HunyuanDiT)',
-        b:'Il primo, da una fotografia produce una forma tridimensionale in 2-3 secondi, condizionandosi direttamente sulle feature DINOv2 senza adattatori. HunyuanDiT, della stessa famiglia, fa il percorso inverso: da una parola produce un’immagine.' },
+        b:'Il primo, da una fotografia produce una forma tridimensionale in 2-3 secondi, condizionandosi direttamente sulle feature <b>DINOv2</b> senza adattatori. HunyuanDiT, della stessa famiglia, fa il percorso inverso: da una parola produce un’immagine.' },
       { t:'LoRA (Low-Rank Adaptation)',
-        b:'Invece di riaddestrare tutto il modello, si aggiungono due piccole matrici (rango 16) e si aggiornano solo quelle: il resto resta congelato. Serve a personalizzare il modello sul singolo utente.' },
+        b:'Invece di riaddestrare tutto il modello, si aggiungono due piccole matrici (rango 16) e si aggiornano solo quelle: il resto resta congelato. Serve a <b>personalizzare</b> il modello sul singolo utente.' },
       { t:'Rendering volumetrico e realtà virtuale',
         b:'L’oggetto appare come una nuvola di particelle in cui la densità rappresenta la confidenza del modello. Rende l’incertezza visibile invece di nasconderla: è una scelta rappresentazionale, non estetica.' },
     ],
@@ -519,8 +534,8 @@ const SLIDES = [
   /* -------------------------------------------------------------- RESULTS 1 */
   { id:'results1', phase:'post', presenter:'m', accent:'rose',
     kicker:'Risultati · il risultato principale',
-    title:'Su concetti mai visti in addestramento, il segnale c’è',
-    lead:'Una mappa lineare addestrata su alcuni concetti colloca un concetto nuovo, mai visto, nella regione giusta dello spazio DINOv2: abbastanza da distinguerlo da un distrattore.',
+    title:'Su concetti mai visti in addestramento',
+    lead:'Una mappa lineare addestrata su determinati concetti riesce a collocarne uno nuovo, mai visto, nella regione giusta dello spazio DINOv2, abbastanza da distinguerlo da un distrattore.',
     layout:'stats',
     items:[
       { v:'0,744', t:'Somiglianza su concetti mai visti', b:'Media per concetto; 0,724 calcolando trial per trial. Il livello del caso è 0,500.' },
@@ -528,47 +543,48 @@ const SLIDES = [
       { v:'p = 0,005', t:'Significatività',                b:'Su 200 permutazioni: il risultato non si spiega con il caso.' },
       { v:'45/45', t:'Coppie dalla parte giusta',          b:'Tutte le coppie di concetti confrontate sono state ordinate correttamente.' },
     ],
-    note:'È il meccanismo che rende sensata la ricerca nel catalogo: al vettore basta finire nel quartiere giusto.' },
+     },
 
   /* -------------------------------------------------------------- RESULTS 2 */
   { id:'results2', phase:'post', presenter:'s', accent:'rose',
     kicker:'Risultati · analisi',
-    title:'Che cosa decodifichiamo davvero',
+    title:'Analisi dei dati e interpretazione',
     lead:'Dati: Gao et al., soggetto 01, 10 concetti per 40 trial, finestra di immaginazione di 4 secondi.',
     layout:'cards',
     items:[
-      { t:'La decodifica è categorica',
-        b:'Fra categorie diverse — cane, cerchio, tazza, forbici — il sistema arriva a 0,787, contro un caso di 0,25.' },
-      { t:'Ma non riconosce il singolo oggetto',
-        b:'Dentro la stessa categoria — sedia, tazza, orologio, forbici — resta a 0,296: il livello del caso. L’EEG immaginato porta la categoria, non l’identità dell’oggetto.' },
-      { t:'Il modello inverso amplifica, non inventa',
-        b:'Ricostruire il segnale in profondità aggiunge circa 0,09 fra categorie su tutte le bande, ma dentro la stessa categoria lascia tutto al livello del caso: amplifica il segnale che c’è, non lo crea dove non c’è.' },
+      { t:'La decodifica funziona bene per categorie',
+        b:'Fra categorie diverse (<i>animali</i>, <i>forme</i>, <i>oggetti</i>) il sistema arriva a 0,787, contro un caso di 0,25.' },
+      { t:'Risultati peggiori per singoli oggetti',
+        b:'Dentro la stessa categoria (<i>oggetti</i>: <i>sedia</i>, <i>tazza</i>, <i>orologio</i>, <i>forbici</i>) resta a 0,296: il livello del caso.' },
       { t:'L’artefatto del centroide',
-        b:'Con il protocollo «escludi-uno» ingenuo l’accuratezza scende sotto il caso, a 0,322. Non è un fallimento: la regressione contrae le predizioni verso il centro dei concetti di addestramento, e il concetto escluso è il più periferico, quindi il più lontano dalla posizione prevista.' },
+        b:[ 'Con il protocollo «escludi-uno» l’accuratezza è <b>0,322</b>, sotto il livello del caso (<b>0,500</b>). Lo stesso risultato si otterrebbe con un modello che non sa nulla.',
+  'La ridge, per non sovra-adattarsi, tira le predizioni verso il <b>centro</b> dei concetti di addestramento. Il concetto giusto è stato escluso, quindi sta in periferia; il distrattore invece <b>era nel training</b>, quindi sta vicino al centro.',
+  'Così la predizione cade sempre più vicina al distrattore che alla risposta giusta. Il numero sotto il caso è la firma di una <b>distorsione del protocollo</b>, non di un fallimento del modello.',] },
       { t:'Il protocollo «escludi-la-coppia»',
-        b:'Escludendo entrambi i termini del confronto, nessuno dei due può essere il centro: il bias sparisce e riemerge il segnale vero, 0,744.' },
+        b: ['Si escludono dal training <b>entrambi</b> i concetti del confronto: nessuno dei due è più centrale dell’altro.',
+  'La contrazione li penalizza allo stesso modo, il bias si annulla per simmetria e riemerge il segnale vero: <b>0,744</b>.',] },
     ],
     note:'' },
 
   /* ----------------------------------------------------------------- LIMITS */
   { id:'limits', phase:'post', presenter:'m', accent:'amber',
-    kicker:'Conclusioni · onestà',
-    title:'Il risultato negativo, e i limiti dichiarati',
+    kicker:'Conclusioni',
+    title:'Risultato negativo e limiti',
     lead:'',
     layout:'cards',
     items:[
       { t:'La pipeline completa non batte il caso',
-        b:'Con l’encoder congelato, il LoRA e la ricerca in catalogo, le sessioni proprie restano al livello del caso o sotto: 0,20 contro 0,25 su P1, 0,35 contro 0,33 su P2. L’encoder appreso fa strettamente peggio di una semplice mappa lineare.' },
-      { t:'Perché: il collo di bottiglia è l’encoder',
-        b:'L’encoder è addestrato su segnali registrati mentre le persone guardano, ma viene usato mentre immaginano: collassa il segnale di immaginazione prima che l’informazione di categoria sia sfruttabile. Il LoRA, su poche decine di esempi, si adatta a memoria.' },
+        b:'Con l’encoder congelato, il LoRA e la ricerca in catalogo, le sessioni proprie restano <b>al livello del caso o sotto</b>: 0,20 contro 0,25 su P1, 0,35 contro 0,33 su P2. L’encoder appreso fa strettamente <b>peggio di una semplice mappa lineare</b>.' },
+      { t:'Motivo: il collo di bottiglia è l’encoder',
+        b:'L’encoder è addestrato su segnali registrati mentre le persone <b>guardano</b>, ma viene usato mentre <b>immaginano</b>: <b>collassa</b> il segnale di immaginazione prima che l’informazione di categoria sia sfruttabile. Il LoRA, su poche decine di esempi, si adatta a memoria.' },
       { t:'L’implicazione è architetturale, non concettuale',
-        b:'Non è l’idea a non funzionare: il segnale c’è, e una mappa lineare lo trova. La conseguenza è sostituire l’encoder congelato con una mappa lineare verso DINOv2.' },
+        b:'Non è l’idea a non funzionare: il segnale c’è e una mappa lineare lo trova. La conseguenza è sostituire l’encoder congelato con una <b>mappa lineare verso DINOv2</b>.' },
       { t:'I limiti dei dati',
         b:'Il risultato su concetti mai visti riguarda un solo soggetto, 10 concetti e 40 trial. La metrica è una scelta forzata fra due alternative, non una ricerca aperta su milioni di immagini.' },
       { t:'Ciò che non è ancora provato',
-        b:'Il ciclo interattivo è implementato ed esercitato con partecipanti reali, ma non ancora valutato in uno studio confermativo. La generalizzazione fra montaggi diversi è una proprietà di progetto, non una proprietà testata empiricamente.' },
+        b:['Il ciclo interattivo è implementato ed esercitato con partecipanti reali, ma non ancora valutato in uno studio confermativo.', 'La generalizzazione fra montaggi diversi è una proprietà di progetto, non una proprietà testata empiricamente.'] },
     ],
-    note:'Il g.HIamp richiede montaggio professionale e gel: la validità ecologica resta limitata.' },
+    note:'' },
 
 ];
 /* === SLIDES:END === */
@@ -576,94 +592,107 @@ const SLIDES = [
 /* === DATA:BEGIN === */
 const WORLD = { w: 4000, h: 2400 };
 
-const BLOCKS = [
-  { id:'eeg',       n:'01', presenter:'m', accent:'cyan',   x: 360,  y: 560,  w: 380, h: 220,
-    title:'Acquisizione del segnale cerebrale', tag:'Acquisizione', oneLiner:'L’utente immagina, l’amplificatore ascolta la corteccia.', steps:[
-      { t:'Immaginare, non guardare', b:'L’amplificatore indossabile registra l’attività della corteccia mentre l’utente immagina l’oggetto, senza averlo davanti.' },
-      { t:'Qualunque casco, tramite LSL', b:'Ogni amplificatore si collega con LSL: dal g.HIamp a 64 canali all’Emotiv Insight 2 a 5 canali.' },
-      { t:'Un formato unico', b:'Il segnale viene riportato a 250 Hz e tagliato in finestre di 256 campioni, circa un secondo, con le posizioni nominate dal sistema 10-5.' },
-      { t:'Via le finestre sporche', b:'Le finestre che superano ±150 µV da picco a picco vengono scartate prima di passare all’encoder.' },
-      { t:'Un pacchetto indipendente dal casco', b:'Quello che esce non porta più traccia del dispositivo usato: è un pacchetto di segnale che l’encoder può leggere da qualunque sorgente.' },
+/* Blocks declare a column/row instead of absolute coordinates: the grid derives
+   x/y, so every block in a row stays aligned by construction and re-spacing the
+   whole map is a one-number change (gapX / gapY). WORLD.w follows the content so
+   the map stays centred; WORLD.h stays fixed because the vertical framing of the
+   demo/outro cameras is tuned by hand. */
+const GRID = { colW:400, rowH:220, gapX:200, gapY:160, originX:600, originY:560 };
+
+function layout(blocks){
+  for(const b of blocks){
+    b.w ??= GRID.colW;
+    b.h ??= GRID.rowH;
+    b.x = GRID.originX + b.col * (GRID.colW + GRID.gapX);
+    b.y = GRID.originY + b.row * (GRID.rowH + GRID.gapY);
+  }
+  const right = Math.max(...blocks.map(b => b.x + b.w));
+  WORLD.w = right + GRID.originX;          // symmetric side margins
+  return blocks;
+}
+
+const BLOCKS = layout([
+  { id:'eeg',       n:'01', presenter:'m', accent:'cyan',   col: 0, row: 0, w: 380,
+    title:'Acquisizione del segnale cerebrale', tag:'Acquisizione', oneLiner:'', steps:[
+      { t:'Procedimento', b:[
+        'L’amplificatore indossabile registra l’attività della corteccia mentre l’utente immagina l’oggetto, senza averlo davanti.',
+        'Il segnale viene riportato a <b>250 Hz</b> e tagliato in finestre di <b>256 campioni</b> (circa un secondo) con le posizioni nominate dal sistema <b>10-5</b>.',
+        'Le finestre che superano <b>±150 µV</b> da picco a picco vengono scartate prima di passare all’encoder.',
+      ] },
+      { t:'Indipendenza dal dispositivo', b:[
+        'Ogni amplificatore si collega con <b>LSL</b>: dal g.HIamp a 64 canali all’Emotiv Insight 2 a 5 canali.',
+        'Quello che esce non porta più traccia del dispositivo usato: è un pacchetto di segnale che l’encoder può leggere da qualunque sorgente.',
+      ] },
     ] },
-  { id:'encoder',   n:'02', presenter:'s', accent:'cyan',   x: 1080, y: 560,  w: 400, h: 220,
-    title:'Encoder indipendente dal casco', tag:'Encoder · allineamento a DINOv2', oneLiner:'Dal segnale cerebrale a un’impronta visiva.', steps:[
-      { t:'EnigmaBrainMap', b:'Una rete convoluzionale da circa 8,7 milioni di parametri. Il segnale, da qualunque casco arrivi, viene portato in una rappresentazione comune indipendente dal dispositivo.' },
-      { t:'Una lista di 1536 numeri', b:'L’encoder trasforma il segnale cerebrale in una lista di 1536 numeri: una specie di impronta visiva del concetto immaginato. È lo stesso identico formato che il generatore 3D si aspetta in ingresso.' },
-      { t:'Nessun traduttore in mezzo', b:'Per questo il segnale cerebrale può prendere il posto di un’immagine, senza nessun traduttore. Tutte le impronte hanno la stessa lunghezza: conta solo la direzione, il cosa, non l’intensità.' },
-      { t:'Bersagli graduati', b:'In addestramento mostriamo all’encoder molti esempi in blocco, chiedendogli di avvicinare quello giusto e allontanare gli altri. Ma se nel blocco ci sono due mele, il criterio standard le tratterebbe come sbagliate l’una per l’altra. Noi diamo a ogni esempio un grado di correttezza proporzionale a quanto i concetti si somigliano davvero: così il modello impara la struttura semantica condivisa invece di memorizzare i singoli stimoli.' },
-      { t:'Un primo componente, sostituibile', b:'L’aspettativa era che l’encoder portasse nella zona giusta della mappa. Empiricamente non regge: l’encoder congelato collassa il segnale di immaginazione e fa peggio di una semplice mappa lineare. Lo presentiamo come primo componente sostituibile e come risultato negativo documentato, non come contributo validato.' },
+  { id:'encoder',   n:'02', presenter:'s', accent:'cyan',   col: 1, row: 0,
+    title:'Encoder indipendente dal casco', tag:'Encoder · allineamento a DINOv2', oneLiner:'', steps:[
+      { t:'EnigmaBrainMap', b:'Una rete convoluzionale da circa <b>8,7 milioni</b> di parametri. Il segnale, da qualunque casco arrivi, viene portato in una rappresentazione comune indipendente dal dispositivo.' },
+      {b:'L’encoder trasforma il segnale cerebrale in una lista di <b>1536 numeri</b> (vettore <b>CLS</b>), lo stesso formato che il generatore 3D si aspetta in ingresso. Tutte le impronte hanno la stessa lunghezza (<b>normalizzazione</b>).'},
+      { t:'Bersagli graduati', b:[['L’encoder viene addestrato su molti esempi in blocco, allenandosi ad avvicinare quello giusto e allontanare gli altri.'], ['Il criterio standard tratterebbe però immagini diverse dello stesso oggetto come lontane l’una dall’altra. '], [' Abbiamo perciò fornito a ogni esempio un grado di correttezza proporzionale alla reale somiglianza tra concetti: in questo modo, il modello impara la <b>struttura semantica condivisa</b> anziché memorizzare i singoli stimoli.']] },
+      { b:'Le prove empiriche mostrano che l’encoder congelato fa collassare il segnale di immaginazione, performando peggio di una semplice mappa lineare. Lo presentiamo quindi come primo componente sostituibile e come <b>risultato negativo documentato</b>.' },
     ] },
-  { id:'retrieval', n:'03', presenter:'m', accent:'cyan',   x: 1800, y: 560,  w: 400, h: 220,
-    title:'Ricerca nel catalogo visivo · FAISS', tag:'Recupero', oneLiner:'Al generatore diamo una fotografia vera, non il vettore.', steps:[
-      { t:'Perché cercare invece di generare', b:'Al generatore 3D non diamo il vettore stimato dall’EEG, che è rumoroso. Gli diamo una fotografia vera, pescata da un catalogo di immagini reali.' },
-      { t:'Tre vantaggi', b:'Robustezza: al vettore basta finire nel quartiere giusto, al resto pensa il catalogo, e un problema di sintesi mal posto diventa un problema di indicizzazione ben posto. Leggibilità: l’utente vede subito un’immagine e una parola, e capisce cosa il sistema ha creduto di leggere. Qualità: da una fotografia pulita i generatori producono forme migliori che da un vettore rumoroso.' },
-      { t:'Quattordici milioni di immagini', b:'Il catalogo indicizza circa 14 milioni di fotografie di ImageNet-21k, organizzate per una ricerca rapidissima per somiglianza.' },
-      { t:'Meno di trenta millesimi di secondo', b:'Tutte le impronte hanno lunghezza uno. Quando le lunghezze sono fissate, misurare quanto due concetti si somigliano si riduce a una moltiplicazione: un’operazione elementare, che il processore fa in un lampo. Per questo cercare fra quattordici milioni richiede meno di trenta millesimi di secondo, senza nemmeno una scheda grafica.' },
-      { t:'La prima della lista, subito', b:'L’impronta che esce dall’EEG diventa una domanda al catalogo: trovami l’immagine che ti somiglia di più. Il sistema restituisce la prima della lista — la fotografia, la parola che la descrive e un punteggio di somiglianza — e la mostra all’utente mentre l’oggetto 3D è ancora in costruzione. Un’ipotesi leggibile in pochi millesimi di secondo, invece di due o tre secondi davanti a una scena vuota.' },
+  { id:'retrieval', n:'03', presenter:'m', accent:'cyan',   col: 2, row: 0,
+    title:'Ricerca nel catalogo visivo · FAISS', tag:'Recupero', oneLiner:'', steps:[
+      { t:'Ricerca anziché generazione', b:'Al generatore 3D non viene fornito direttamente il vettore rumoroso stimato dall’EEG, ma <b>un\'immagine</b> recuperata da un catalogo.' },
+      { b:'Il catalogo indicizza circa <b>14 milioni</b> di fotografie di <b>ImageNet-21k</b>, organizzate per somiglianza.' },
+      { t:'Meno di trenta millesimi di secondo', b:'Tutte le impronte hanno lunghezza fissata a 1: misurare quanto due concetti si somigliano si riduce quindi a una banale moltiplicazione per il processore. Cercare fra quattordici milioni di immagini richiede <b>meno di 30ms</b>, senza scheda grafica.' },
+      { t:'Vantaggi', b:[
+  '<b>Robustezza</b>: il vettore non deve essere esatto; è sufficiente che cada vicino al concetto giusto, poi a scegliere l’immagine pensa il catalogo.',
+  '<b>Leggibilità</b>: se il sistema ha sbagliato concetto, lo si nota subito, prima ancora di generare il 3D.',
+  '<b>Qualità</b>: il generatore è nato per lavorare su immagini reali e produce forme nettamente migliori ricevendo queste al posto dei vettori.',
+] },
     ] },
-  { id:'gen',       n:'04', presenter:'s', accent:'cyan',   x: 2520, y: 560,  w: 380, h: 220,
-    title:'Generazione della forma 3D · Hunyuan3D', tag:'Generazione 3D', oneLiner:'Dalla fotografia recuperata a una forma solida.', steps:[
-      { t:'Da immagine a oggetto', b:'Hunyuan3D 2.1 riceve la fotografia recuperata dal catalogo e ne ricava una forma tridimensionale.' },
-      { t:'Non il vettore, l’immagine', b:'Il generatore è condizionato dall’immagine reale, non dall’impronta stimata dall’EEG: parte da un ingresso pulito.' },
-      { t:'Parla già DINOv2', b:'Hunyuan3D si condiziona sulle stesse feature DINOv2 che l’encoder imita: per questo la catena si chiude senza nessun adattatore in mezzo.' },
-      { t:'Un oggetto alla volta', b:'Il risultato è un singolo oggetto 3D, generato uno alla volta e pronto per essere mostrato in realtà virtuale.' },
-      { t:'Il collo di bottiglia', b:'La sintesi richiede 2-3 secondi: è il punto più lento di tutta la catena, e la ragione per cui la fotografia viene mostrata prima.' },
+  { id:'gen',       n:'04', presenter:'s', accent:'cyan',   col: 3, row: 0, w: 380,
+    title:'Generazione della forma 3D · Hunyuan3D', tag:'Generazione 3D', oneLiner:'', steps:[
+      { t:'Da immagine a oggetto', b:['Hunyuan3D 2.1 riceve l\'immagine recuperata dal catalogo e ne ricava una forma tridimensionale.' , 'Il risultato è un <b>singolo oggetto 3D</b>, pronto per essere mostrato in realtà virtuale.']},
+      { t:'Vantaggi', b:['Il generatore è condizionato dall’immagine reale, non dall’impronta stimata dall’EEG (ingresso pulito).','Hunyuan3D si condiziona sulle stesse feature DINOv2 che l’encoder imita: la catena si chiude senza <b>nessun adattatore in mezzo</b>.'] },
+      { t:'Il collo di bottiglia', b:'La sintesi richiede <b>2-3 secondi</b>: è il punto più lento di tutta la catena.' },
     ] },
-  { id:'render',    n:'05', presenter:'m', accent:'rose',   x: 3240, y: 560,  w: 400, h: 220,
-    title:'Visualizzazione volumetrica', tag:'Stato di sogno', oneLiner:'L’incertezza si vede: nuvola che diventa superficie.', steps:[
-      { t:'L’incertezza si vede', b:'L’oggetto appare in realtà virtuale come una nuvola di particelle, non come un solido già finito.' },
-      { t:'La densità è la confidenza', b:'Dove il modello è sicuro la nuvola si infittisce fino a solidificarsi in superficie; dove è incerto resta rarefatta.' },
-      { t:'Una scelta rappresentazionale', b:'Non è un effetto estetico: mostrare l’incertezza invece di nasconderla è una decisione di progetto.' },
-      { t:'Il motore', b:'La scena gira in Unreal Engine 5 e viene indossata con il Meta Quest 3.' },
-      { t:'Anteprima progressiva: percorso sperimentale', b:'Un percorso guidato sperimentale mostra l’oggetto mentre cresce: 5000 punti campionati su una griglia 32³, trasmessi in streaming con la camera che orbita. Il sistema a regime non lo usa: riceve direttamente la forma finale.' },
+  { id:'render',    n:'05', presenter:'m', accent:'rose',   col: 4, row: 0,
+    title:'Visualizzazione volumetrica', tag:'Stato di sogno', oneLiner:'', steps:[
+      { b:'L’oggetto appare in realtà virtuale come una nuvola di particelle, non come un solido già finito, in modo da rispettare l’incertezza del risultato.' },
+      { t:'Il motore', b:'La scena gira in Unreal Engine 5 e viene visualizzata in un ambiente virtuale all\'interno del visore Meta Quest 3.' },
     ] },
-  { id:'feedback',  n:'06', presenter:'s', accent:'rose',   x: 3240, y: 1360, w: 400, h: 220,
-    title:'Riscontro dell’utente · catena della verità', tag:'Nominare è confermare', oneLiner:'Nominare è insieme comunicare e supervisionare.', steps:[
-      { t:'Nominare è confermare', b:'Pronunciare il nome dell’oggetto è al tempo stesso un atto comunicativo e il segnale di supervisione che il sistema aspetta.' },
-      { t:'Dalla parola all’immagine', b:'La parola diventa una richiesta a HunyuanDiT, che ne produce un’immagine di riferimento: la verità di quel momento.' },
-      { t:'Tutto nello stesso spazio', b:'L’immagine di riferimento viene riletta da DINOv2 e diventa a sua volta una lista di 1536 numeri. Nessun CLIP: un solo spazio visivo, dall’inizio alla fine.' },
+  { id:'feedback',  n:'06', presenter:'s', accent:'rose',   col: 4, row: 1,
+    title:'Riscontro dell’utente · truth chain', tag:'Nominare è confermare', oneLiner:'', steps:[
+      { b: ['L\'utente <b>pronuncia</b> il nome dell\'oggetto a cui ha pensato.','L\'input vocale diventa <b>testuale</b> e il prompt viene passato a <b>HunyuanDiT</b>, che ne produce un’immagine di riferimento: quella "vera" (da qui il nome <i>truth chain</i>).', 'L’immagine di riferimento viene riletta da <b>DINOv2</b> e diventa a sua volta un <b>CLS</b>.']},
       { t:'La coppia di calibrazione', b:'La coppia formata dalla verità e dall’ipotesi del sistema viene salvata su disco come dato di calibrazione.' },
-      { t:'Il ciclo si chiude', b:'Il sistema non è un decodificatore in un colpo solo: impara dal nome pronunciato. Il modello propone, l’utente nomina, il sistema impara.' },
     ] },
-  { id:'arbiter',   n:'07', presenter:'m', accent:'amber',  x: 2520, y: 1360, w: 400, h: 220,
-    title:'Somiglianza fra vettori · l’arbitro', tag:'Arbitro', oneLiner:'La somiglianza decide: solidificare o rigenerare.', steps:[
-      { t:'Quanto ci siamo andati vicino', b:'Si misura la somiglianza fra la verità e l’ipotesi: un numero fra -1 e 1 che dice quanto due impronte puntano nella stessa direzione. Quel numero viene confrontato con una soglia θ.' },
-      { t:'Se la somiglianza è alta', b:'L’oggetto si solidifica, il bersaglio per l’addestramento è l’impronta dell’immagine recuperata e il catalogo resta com’è.' },
-      { t:'Se la somiglianza è bassa', b:'L’oggetto si dissolve e viene rigenerato a partire dalla verità; il bersaglio diventa l’impronta della verità e nasce una nuova voce di catalogo.' },
-      { t:'In ogni caso si impara', b:'In entrambi i casi la coppia formata dal segnale EEG e dall’impronta finisce nell’archivio degli esempi.' },
-      { t:'Il passaggio automatico non è ancora cablato', b:'La somiglianza è già calcolata ed esposta come confidenza, ma la decisione automatica sulla soglia θ non è ancora collegata: oggi a decidere è il nome pronunciato dall’utente.' },
+  { id:'arbiter',   n:'07', presenter:'m', accent:'amber',  col: 3, row: 1,
+    title:'Somiglianza fra vettori · l’arbitro', tag:'Arbitro', oneLiner:'', steps:[
+      { b:'Si misura la distanza fra verità e ipotesi tramite <b>similarità coseno</b>. Il risultato è compreso tra -1 e 1 e viene confrontato con una <b>soglia θ</b>.' },
+      { t:'Se la somiglianza è alta', b:'L’oggetto virtuale si solidifica. Il bersaglio per l’addestramento era corretto e il catalogo resta com’è.' },
+      { t:'Se la somiglianza è bassa', b:'L’oggetto virtuale si dissolve e viene rigenerato a partire dalla verità; il bersaglio diventa la seconda immagine e nasce una nuova voce di catalogo.' },
+      { b:'In entrambi i casi, la coppia formata da <b>segnale EEG e impronta CLS</b> viene salvata nel database.' },
+      { t:'Limite', b:'Attualmente, non è ancora prevista la decisione automatica sulla soglia θ. A decidere è il nome pronunciato dall’utente.' },
     ] },
-  { id:'trainer',   n:'08', presenter:'s', accent:'violet', x: 1080, y: 1360, w: 400, h: 220,
-    title:'Addestramento LoRA · archivio degli esempi', tag:'Adattamento', oneLiner:'Ogni conferma aggiorna il modello personale dell’utente.', steps:[
-      { t:'Solo due piccole matrici', b:'Si aggiunge un adattatore LoRA di rango 16 sopra la testa di DINOv2: tutto il resto della rete resta congelato.' },
-      { t:'Un archivio per ogni utente', b:'Ogni utente ha il suo archivio di coppie formate dal segnale EEG e dal bersaglio; a ogni conferma il modello si aggiorna su tutte le coppie raccolte.' },
+  { id:'trainer',   n:'08', presenter:'s', accent:'violet', col: 1, row: 1,
+    title:'Addestramento LoRA · archivio degli esempi', tag:'Adattamento', oneLiner:'', steps:[
+      { t:'Adattamento per utente', b:['Si aggiunge un <b>adattatore LoRA di rango 16</b> sopra la testa di DINOv2: il resto della rete, condivisa tra utenti, resta invariato.', 'Ogni utente ha il suo database di coppie formate dal segnale EEG e dal bersaglio; a ogni conferma, il modello si aggiorna su tutte le coppie raccolte.' ]},
       { t:'L’obiettivo', b:'L’addestramento avvicina il più possibile la direzione dell’impronta prevista a quella del bersaglio.' },
-      { t:'Personalizzazione isolata', b:'L’adattamento personalizza il modello senza toccare i pesi pre-addestrati condivisi con gli altri utenti.' },
-      { t:'Un aggiornamento in pochi secondi', b:'L’aggiornamento richiede 1-3 secondi: abbastanza rapido da restare dentro la sessione.' },
+      { b:'L’aggiornamento richiede <b>1-3 secondi</b>: abbastanza rapido da non interrompere la sessione.' },
     ] },
-  { id:'dbupdate',  n:'+',  presenter:'m', accent:'violet', x: 1800, y: 1360, w: 380, h: 220,
-    title:'Aggiornamento del catalogo', tag:'Catalogo', oneLiner:'Il catalogo cresce a ogni ipotesi respinta.', steps:[
-      { t:'Un catalogo vivo', b:'Il catalogo su cui si fa la ricerca non è statico: cresce con l’uso del sistema.' },
-      { t:'Si aggiunge solo quando si sbaglia', b:'Una nuova voce nasce soltanto quando l’ipotesi viene respinta: si salvano l’impronta della verità, la sua immagine e la parola.' },
-      { t:'Marcata per utente, valida per tutti', b:'La voce porta il nome di chi l’ha generata, ma confluisce in un indice unico e condiviso.' },
-      { t:'Inserimento sicuro', b:'L’indice e le sue etichette si aggiornano insieme, in un colpo solo, e il catalogo torna disponibile senza riavviare nulla.' },
-      { t:'Un vocabolario che cresce per tutti', b:'La personalizzazione vive nell’encoder; il vocabolario visivo, invece, cresce per l’intero sistema.' },
+  { id:'dbupdate',  n:'+',  presenter:'m', accent:'violet', col: 2, row: 1, w: 380,
+    title:'Aggiornamento del catalogo', tag:'Catalogo', oneLiner:'', steps:[
+      { b:['Il catalogo su cui si svolge la ricerca non è statico: cresce con l’uso del sistema.', 'Una nuova voce nasce soltanto quando l’ipotesi viene <b>respinta</b>.'] },
+      { t:'Inserimento rapido', b:'L’indice e le sue etichette si aggiornano insieme e il catalogo torna disponibile senza richiedere un riavvio.' },
+      { t:'Aggiornamento database VS LoRA', b:'Mentre la personalizzazione dell\'encoder è isolata per ogni utente, il vocabolario visivo cresce per l’intero sistema ed è <b>condiviso</b>.' },
     ] },
-];
+]);
 
 /* Directed edges of the circuit. kind: solid (data flow) | dashed (learning/update feedback).
    curve: 'straight' | 'down' | 'up' | 'loop' — hint for the engine's edge router. */
 const EDGES = [
-  { from:'eeg',       to:'encoder',   kind:'solid',  curve:'straight', label:'segnale EEG' },
-  { from:'encoder',   to:'retrieval', kind:'solid',  curve:'straight', label:'impronta · 1536 numeri' },
-  { from:'retrieval', to:'gen',       kind:'solid',  curve:'straight', label:'immagine recuperata' },
-  { from:'gen',       to:'render',    kind:'solid',  curve:'straight', label:'oggetto 3D → realtà virtuale' },
-  { from:'render',    to:'feedback',  kind:'solid',  curve:'straight', label:'utente nomina' },
-  { from:'feedback',  to:'arbiter',   kind:'solid',  curve:'straight', label:'verità contro ipotesi' },
-  { from:'arbiter',   to:'trainer',   kind:'solid',  curve:'down',     label:'(EEG, impronta) → archivio' },
-  { from:'arbiter',   to:'dbupdate',  kind:'solid',  curve:'straight', label:'s<θ · nuova voce' },
-  { from:'trainer',   to:'encoder',   kind:'dashed', curve:'straight', label:'aggiornamento pesi LoRA' },
-  { from:'dbupdate',  to:'retrieval', kind:'dashed', curve:'straight', label:'catalogo aggiornato' },
+  { from:'eeg',       to:'encoder',   kind:'solid',  curve:'straight' },
+  { from:'encoder',   to:'retrieval', kind:'solid',  curve:'straight'  },
+  { from:'retrieval', to:'gen',       kind:'solid',  curve:'straight' },
+  { from:'gen',       to:'render',    kind:'solid',  curve:'straight'  },
+  { from:'render',    to:'feedback',  kind:'solid',  curve:'straight'},
+  { from:'feedback',  to:'arbiter',   kind:'solid',  curve:'straight'},
+  { from:'arbiter',   to:'trainer',   kind:'solid',  fromSide:'B', toSide:'B', elbow: 120 },
+  { from:'arbiter',   to:'dbupdate',  kind:'solid',  curve:'straight',  },
+  { from:'trainer',   to:'encoder',   kind:'dashed', curve:'straight'  },
+  { from:'dbupdate',  to:'retrieval', kind:'dashed', curve:'straight' },
 ];
 /* === DATA:END === */
 
@@ -730,30 +759,91 @@ const byId = id => BLOCKS[blockIndex[id]];
 
 /* ---- edge router: derive sides from geometry + curve hint ---- */
 const BOW_DOWN = 430, BOW_UP = 180;
+/* b.h is the layout slot; the visible card is drawn CARD_TRIM shorter and
+   top-aligned inside it (the halo hugs that card with HALO_PAD of slack). So the slot's top edge
+   coincides with the card's, but its bottom edge does not: anchor 'B' must
+   follow the drawn card, or an arrow arriving from below stops short of it.
+   The same trim shifts the card's vertical centre up by CARD_TRIM/2, so 'L'/'R'
+   follow that centre instead of b.y. Every side now meets the drawn card. */
+const CARD_TRIM = 40, HALO_PAD = 4, CARD_RADIUS = 22;   // CARD_RADIUS mirrors .wnode's border-radius
 function anchor(b, side){
   const hw=b.w/2, hh=b.h/2;
-  if(side==='L') return {x:b.x-hw, y:b.y, nx:-1, ny:0};
-  if(side==='R') return {x:b.x+hw, y:b.y, nx:1, ny:0};
-  if(side==='T') return {x:b.x, y:b.y-hh, nx:0, ny:-1};
-  return {x:b.x, y:b.y+hh, nx:0, ny:1}; // B
+  const cy=b.y-CARD_TRIM/2;                                        // drawn card's centre
+  if(side==='L') return {x:b.x-hw, y:cy, nx:-1, ny:0};
+  if(side==='R') return {x:b.x+hw, y:cy, nx:1, ny:0};
+  if(side==='T') return {x:b.x, y:b.y-hh, nx:0, ny:-1};            // slot top == card top
+  return {x:b.x, y:b.y+hh-CARD_TRIM, nx:0, ny:1};                  // B: real card bottom
 }
-function route(a, b, curve){
+function route(a, b, curve, e){
   const dx=b.x-a.x, dy=b.y-a.y;
   let fromSide, toSide, horiz;
-  if(Math.abs(dx) >= Math.abs(dy)){ horiz=true;  fromSide=dx>0?'R':'L'; toSide=dx>0?'L':'R'; }
-  else                            { horiz=false; fromSide=dy>0?'B':'T'; toSide=dy>0?'T':'B'; }
+  /* Sides declared on the edge itself win over the geometry heuristic: some
+     return paths read better leaving and entering from a chosen face. */
+  if (e && e.fromSide && e.toSide) {
+    fromSide = e.fromSide;
+    toSide   = e.toSide;
+    horiz    = true;                 // so the curve hints (down/up) still apply
+  }
+  else if (curve === 'bottom') {
+    fromSide = 'B';
+    toSide = 'B';
+    horiz = true;
+}
+else if (Math.abs(dx) >= Math.abs(dy)) {
+    horiz = true;
+    fromSide = dx > 0 ? 'R' : 'L';
+    toSide = dx > 0 ? 'L' : 'R';
+}
+else {
+    horiz = false;
+    fromSide = dy > 0 ? 'B' : 'T';
+    toSide = dy > 0 ? 'T' : 'B';
+}
   const A=anchor(a,fromSide), B=anchor(b,toSide);
+  /* Orthogonal three-segment route: leave along the anchor normal, run straight
+     across, come back in along the target's normal. 'elbow' is how far the
+     crossing segment sits beyond the anchors; 'r' rounds the two corners so the
+     polyline still matches the rounded language of the cards. Only meaningful
+     for vertical normals (both sides 'T' or both 'B'). */
+  if(e && e.elbow != null && A.ny !== 0 && A.ny === B.ny){
+    const dirY = A.ny;
+    const yLine = (dirY > 0 ? Math.max(A.y, B.y) : Math.min(A.y, B.y)) + dirY * e.elbow;
+    const sx = Math.sign(B.x - A.x) || 1;
+    const r = Math.min(e.r != null ? e.r : 24, Math.abs(B.x - A.x)/2,
+                       Math.abs(yLine - A.y), Math.abs(yLine - B.y));
+    const d = `M ${A.x} ${A.y} L ${A.x} ${yLine - dirY*r}`
+            + ` Q ${A.x} ${yLine} ${A.x + sx*r} ${yLine}`
+            + ` L ${B.x - sx*r} ${yLine}`
+            + ` Q ${B.x} ${yLine} ${B.x} ${yLine - dirY*r}`
+            + ` L ${B.x} ${B.y}`;
+    return { d, mid:{ x:(A.x+B.x)/2, y:yLine } };
+  }
   const dist=Math.hypot(B.x-A.x, B.y-A.y);
-  const ext=Math.min(dist*0.42, 280);
+  /* An edge may declare its own 'bow': the total control-point offset along the
+     anchor normal. It replaces the generic ext + BOW_* pair, which is tuned for
+     the long lateral return paths and dives far too deep for a short hop between
+     neighbouring columns. Depth at mid-curve is 0.75 * bow. */
+  const ownBow = e && e.bow != null;
+  const ext = ownBow ? e.bow : Math.min(dist*0.42, 280);
   let c1x=A.x+A.nx*ext, c1y=A.y+A.ny*ext;
   let c2x=B.x+B.nx*ext, c2y=B.y+B.ny*ext;
-  if(horiz){ // lateral edges may bow up/down to clear the circuit
+  if(horiz && !ownBow){ // lateral edges may bow up/down to clear the circuit
     /* Only the two long return paths are horizontal-with-a-hint: 'down' is
        arbiter→dbupdate (must clear the taller trainer card and park its label
        below it), 'up' is dbupdate→retrieval (must stay off encoder's bottom-right
        corner). Re-tuned for NODE_SCALE; both are verified clear at 1280×720. */
-    if(curve==='down'){ c1y+=BOW_DOWN; c2y+=BOW_DOWN; }
-    else if(curve==='up'){ c1y-=BOW_UP; c2y-=BOW_UP; }
+       if(curve==='bottom'){
+        c1y += BOW_DOWN;
+        c2y += BOW_DOWN;
+    }
+    else if(curve==='down'){
+        c1y += BOW_DOWN;
+        c2y += BOW_DOWN;
+    }
+    else if(curve==='up'){
+        c1y -= BOW_UP;
+        c2y -= BOW_UP;
+    }
   }
   const d=`M ${A.x} ${A.y} C ${c1x} ${c1y} ${c2x} ${c2y} ${B.x} ${B.y}`;
   // cubic point at t=0.5 for the mid label
@@ -770,23 +860,22 @@ function buildWorld(){
   let s = `<svg id="world" viewBox="0 0 ${WORLD.w} ${WORLD.h}" width="${WORLD.w}" height="${WORLD.h}">`;
   s += `<defs>`;
   s += `<filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="16" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
-  s += `<marker id="ar-neu" markerWidth="11" markerHeight="11" refX="8.5" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10 z" fill="${PAL.edgeNeu}"/></marker>`;
-  s += `<marker id="ar-vio" markerWidth="11" markerHeight="11" refX="8.5" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10 z" fill="${HEX.violet}"/></marker>`;
-  s += `<marker id="ar-amb" markerWidth="11" markerHeight="11" refX="8.5" refY="5" orient="auto"><path d="M0,0 L9,5 L0,10 z" fill="${HEX.amber}"/></marker>`;
+  s += `<marker id="ar-neu" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L4,2.5 L0,5 z" fill="${PAL.edgeNeu}"/></marker>`;
+  s += `<marker id="ar-vio" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L4,2.5 L0,5 z" fill="${HEX.violet}"/></marker>`;
+  s += `<marker id="ar-amb" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L4,2.5 L0,5 z" fill="${HEX.amber}"/></marker>`;
   s += `</defs>`;
 
   // edges
   s += `<g id="gEdges">`;
   EDGES.forEach((e,i)=>{
     const a=byId(e.from), b=byId(e.to);
-    const r=route(a,b,e.curve);
+    const r=route(a,b,e.curve,e);
     const col=edgeColor(e);
     const dash=e.kind==='dashed'?`stroke-dasharray="11 10"`:'';
     const w=e.kind==='dashed'?2.6:2.4;
     const lw=(e.label||'').length*10.5+22, lh=32;
     s += `<g class="edge ${e.kind}" data-i="${i}" data-from="${blockIndex[e.from]}" data-to="${blockIndex[e.to]}">`;
     s += `<path class="wire" d="${r.d}" stroke="${col}" stroke-width="${w}" ${dash} marker-end="url(#${markerId(e)})"/>`;
-    s += `<g class="elabel" transform="translate(${r.mid.x},${r.mid.y})"><rect x="${-lw/2}" y="${-lh/2}" width="${lw}" height="${lh}" rx="8"/><text x="0" y="6" text-anchor="middle">${esc(e.label||'')}</text></g>`;
     s += `</g>`;
   });
   s += `</g>`;
@@ -799,10 +888,12 @@ function buildWorld(){
   BLOCKS.forEach((b,i)=>{
     const hx=b.x-b.w/2, hy=b.y-b.h/2;
     s += `<g class="node accent-${b.accent}" data-i="${i}">`;
-    s += `<rect class="halo" x="${hx-7}" y="${hy-7}" width="${b.w+14}" height="${b.h+14}" rx="27" fill="none" stroke="${HEX[b.accent]}" stroke-width="3" filter="url(#glow)"/>`;
-    s += `<foreignObject x="${hx}" y="${hy}" width="${b.w}" height="${b.h}">`;
+    /* The halo tracks the drawn card with a uniform HALO_PAD on every side, so it
+       stays concentric instead of hanging lower than the card. */
+    s += `<rect class="halo" x="${hx-HALO_PAD}" y="${hy-HALO_PAD}" width="${b.w+2*HALO_PAD}" height="${b.h-CARD_TRIM+2*HALO_PAD}" rx="${CARD_RADIUS+HALO_PAD}" fill="none" stroke="${HEX[b.accent]}" stroke-width="2" filter="url(#glow)"/>`;
+    s += `<foreignObject x="${hx}" y="${hy}" width="${b.w}" height="${b.h-CARD_TRIM}">`;
     s += `<div xmlns="http://www.w3.org/1999/xhtml" class="wnode accent-${b.accent}">`;
-    s += `<span class="wbar"></span><span class="wdot ${b.presenter}"></span>`;
+    s += `<span class="wbar"></span>`;
     s += `<div class="wn">${esc(b.n)}</div>`;
     s += `<div class="wtitle">${esc(b.title)}</div>`;
     s += `<div class="wone">${esc(b.oneLiner)}</div>`;
@@ -829,7 +920,7 @@ function collectWorld(){
       const n=2;
       for(let k=0;k<n;k++){
         const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-        c.setAttribute('r','5'); c.setAttribute('class','flowdot');
+        c.setAttribute('r','3'); c.setAttribute('class','flowdot');
         gDots.appendChild(c);
         dots.push({el:c, off:k/n});
       }
@@ -840,13 +931,19 @@ function collectWorld(){
 buildWorld();
 collectWorld();
 
+/* One advance reveals one unit: a step whose body is a plain string is a single
+   unit, a step whose body is a list spends one unit per bullet. A panel can thus
+   group its points into few cards while still uncovering them one at a time. */
+const bulletsOf = st => Array.isArray(st.b) ? st.b.flat(Infinity) : null;
+const revealCount = b => b.steps.reduce((n,st) => n + (bulletsOf(st)?.length ?? 1), 0);
+
 /* ---- scene list (linear state machine, exact inverse both ways) ---- */
 const SCENES=[];
 SCENES.push({kind:'intro'});
 SLIDES.forEach((s,si)=>{ if(s.phase!=='post') SCENES.push({kind:'slide', si}); });
 SCENES.push({kind:'overview', sub:'initial', done:-1, pulse:0});
 BLOCKS.forEach((b,bi)=>{
-  for(let j=0;j<5;j++) SCENES.push({kind:'block', bi, sj:j});
+  for(let j=0;j<revealCount(b);j++) SCENES.push({kind:'block', bi, sj:j});
   if(bi<BLOCKS.length-1) SCENES.push({kind:'overview', sub:'between', done:bi, pulse:bi+1});
 });
 SCENES.push({kind:'demo'});
@@ -868,6 +965,7 @@ const slNote=document.getElementById('slNote');
 let demoSlot=null;
 const overtitle=document.getElementById('overtitle');
 const tagM=document.getElementById('tag-m'), tagS=document.getElementById('tag-s');
+const whoEl=document.getElementById('who');
 const cnum=document.getElementById('cnum'), pfill=document.getElementById('pfill');
 
 /* ---- camera math ---- */
@@ -880,12 +978,15 @@ function contentBox(){
      Vertically the bowed return paths DO overshoot the node bbox, so keep 150. */
   return { x0:x0-90, y0:y0-150, x1:x1+90, y1:y1+150 };
 }
-function overviewCam(){
+function overviewCam(sc){
   const vw=innerWidth, vh=innerHeight;
   const bb=contentBox(), bw=bb.x1-bb.x0, bh=bb.y1-bb.y0;
   const cx=(bb.x0+bb.x1)/2, cy=(bb.y0+bb.y1)/2;
   const k=Math.min(vw*0.965/bw, vh*0.85/bh);   // fit the actual node bbox, not the empty world
-  return { k, px:vw/2 - k*cx, py:vh*0.56 - k*cy };   // nudged down to clear the floating title
+  /* Only the first overview carries the floating title, so only that one is
+     nudged down to clear it; every later return to the map is centred. */
+  const anchorY = (sc && sc.sub === 'initial') ? 0.56 : 0.5;
+  return { k, px:vw/2 - k*cx, py:vh*anchorY - k*cy };
 }
 function blockCam(b){
   const vw=innerWidth, vh=innerHeight;
@@ -910,7 +1011,7 @@ function cameraFor(sc){
   if(sc.kind==='demo') return centerCam(WORLD.w/2, WORLD.h/2, 1.2);
   if(sc.kind==='outro') return centerCam(WORLD.w/2, WORLD.h/2, 1.2);
   if(sc.kind==='block') return blockCam(BLOCKS[sc.bi]);
-  return overviewCam();
+  return overviewCam(sc);
 }
 function applyCamera(cam, instant){
   camera.style.transition = (reduced||instant) ? 'none' : '';
@@ -952,7 +1053,7 @@ function updateWorld(sc){
 }
 
 /* ---- detail panel ---- */
-let panelBlock=-1, stepEls=[];
+let panelBlock=-1, stepEls=[], bulletEls=[];
 function updatePanel(sc){
   const show = sc.kind==='block';
   panel.classList.toggle('show', show);
@@ -973,11 +1074,25 @@ function updatePanel(sc){
     ptitle.textContent = b.title;
     ptag.textContent = '';
     ptag.style.display = 'none';   /* speaker name hidden in the detail panels */
-    psteps.innerHTML = b.steps.map(st=>`<div class="frag"><div class="ft">${esc(st.t)}</div><div class="fb">${esc(st.b)}</div></div>`).join('');
+    let u=0;
+    psteps.innerHTML = b.steps.map(st=>{
+      const bl=bulletsOf(st), first=u;
+      let body;
+      /* Bodies are passed through unescaped so they can carry <b>/<em>/<br>,
+         mirroring cardBody() for the slides: trusted, author-written content.
+         Titles stay escaped, exactly as the slide cards do. */
+      if(bl){ body = `<ul class="fb-ul">${bl.map(x=>`<li data-u="${u++}">${x}</li>`).join('')}</ul>`; }
+      else  { body = `<div class="fb">${st.b}</div>`; u++; }
+      /* The title is optional: a card can be body-only. */
+      const head = st.t ? `<div class="ft">${esc(st.t)}</div>` : '';
+      return `<div class="frag" data-u="${first}">${head}${body}</div>`;
+    }).join('');
     stepEls=[...psteps.children];
+    bulletEls=[...psteps.querySelectorAll('.fb-ul li')];
   }
-  stepEls.forEach((el,k)=> el.classList.toggle('on', k<=sc.sj));
-  pcount.innerHTML = `<b>${sc.sj+1}</b> / 5`;
+  stepEls.forEach(el => el.classList.toggle('on', +el.dataset.u <= sc.sj));
+  bulletEls.forEach(el => el.classList.toggle('on', +el.dataset.u <= sc.sj));
+  pcount.innerHTML = `<b>${sc.sj+1}</b> / ${revealCount(b)}`;
 }
 
 /* ---- linear content slides ---- */
@@ -1038,7 +1153,7 @@ function counterText(sc){
   if(sc.kind==='overview') return 'MAPPA';
   if(sc.kind==='slide') return (SLIDES[sc.si].kicker||'SLIDE').toUpperCase();
   const b=BLOCKS[sc.bi];
-  return `${b.n} · ${sc.sj+1}/5`;
+  return `${b.n} · ${sc.sj+1}/${revealCount(b)}`;
 }
 
 /* ---- master render ---- */
@@ -1050,6 +1165,8 @@ function render(instant){
   updatePanel(sc);
   updateSlide(sc);
   introEl.classList.toggle('show', sc.kind==='intro');
+  whoEl.classList.toggle('hide', sc.kind==='intro');
+  whoEl.classList.toggle('hide', sc.kind==='outro');
   outroEl.classList.toggle('show', sc.kind==='outro');
   demoEl.classList.toggle('show', sc.kind==='demo');
   if(demoSlot){ if(sc.kind==='demo') demoSlot.play(); else demoSlot.pause(); }   // enter demo → muted autoplay from 0; leave → pause
@@ -1620,8 +1737,9 @@ function viz_feedback(host,b,ac){
 
 /* ---- 7. ARBITER : two unit vectors + angle + gauge (s vs θ) ---- */
 function viz_arbiter(host,b,ac){
+  const spread = 50;
   const s=mkSvg(host,660,340);
-  const ox=150,oy=252,L=150,at=-1.02;
+  const ox = 150 - spread, oy = 252,L=150,at=-1.02;
   s.appendChild(el('circle',{cx:ox,cy:oy,r:3.5,fill:INK2}));
   const rayT=el('line',{x1:ox,y1:oy,stroke:ac,'stroke-width':2.6}); s.appendChild(rayT);
   const tipT=el('circle',{r:5,fill:ac}); s.appendChild(tipT);
@@ -1631,7 +1749,7 @@ function viz_arbiter(host,b,ac){
   const labT=txt('z_truth',0,0,ac,12,'start'); s.appendChild(labT);
   const labH=txt('z_hyp',0,0,INK,12,'start'); s.appendChild(labH);
   s.appendChild(txt('cos(z_truth, z_hyp)',ox,315,INK3,12,'middle'));
-  const gx=478,gy=268,Rg=118,theta=0.62;
+  const gx = 478 + 20, gy = 268,Rg=98,theta=0.62;
   function gp(v){ const a=Math.PI-v*Math.PI; return [gx+Rg*Math.cos(a),gy-Rg*Math.sin(a)]; }
   function arcPoly(v0,v1,st){ let d=''; for(let i=0;i<=st;i++){ const v=v0+(v1-v0)*i/st,p=gp(v); d+=(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)+' '; } return d; }
   s.appendChild(el('path',{d:arcPoly(0,1,60),fill:'none',stroke:`rgba(${PAL.gridRGB},0.2)`,'stroke-width':10,'stroke-linecap':'round'}));

@@ -35,6 +35,8 @@
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
   font-family:var(--sans);-webkit-font-smoothing:antialiased;cursor:default}
 #bg{position:fixed;inset:0;z-index:0;display:block}
+/* PDF export: land on the scene's final state instead of catching a fade. */
+html.exporting *{transition:none!important}
 .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
   background:radial-gradient(130% 90% at 50% 42%,transparent 40%,rgba(var(--vig),var(--vig-a)) 100%)}
 .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
@@ -104,21 +106,24 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
   padding:.28rem .7rem;border-radius:20px;border:1px solid var(--line);color:var(--ink2);text-transform:uppercase;letter-spacing:.08em}
 .ptag::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--cyan)}
 .ptag.silvia::before{background:var(--rose)}
-.psteps{display:flex;flex-direction:column;gap:.55rem;overflow:visible;flex:none}
+/* Gap and card padding are tighter than the visual ideal on purpose: the longest
+   panel (02 Encoder) is what caps the body font size, and the space reclaimed
+   here is what lets the text grow without the panel starting to scroll. */
+.psteps{display:flex;flex-direction:column;gap:.36rem;overflow:visible;flex:none}
 .frag{opacity:0;transform:translateY(12px);filter:blur(2px);
   transition:opacity .45s ease,transform .5s cubic-bezier(.2,.7,.2,1),filter .45s ease;
   background:rgba(var(--frag-bg),.9);border:1px solid var(--line);border-left:3px solid var(--ac);
-  border-radius:12px;padding:.68rem 1rem;-webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px)}
+  border-radius:12px;padding:.55rem .9rem;-webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px)}
 .frag.on{opacity:1;transform:none;filter:none}
 .ft{font-size:clamp(15px,1.35vw,19px);font-weight:680;color:var(--ink);letter-spacing:-.01em}
-.fb{font-size:clamp(13px,1.05vw,15px);color:var(--ink2);line-height:1.38;margin-top:.45rem}
+.fb{font-size:clamp(13.5px,1.15vw,17px);color:var(--ink2);line-height:1.44;margin-top:.45rem}
 /* Bodies accept inline markup (<b>, <em>, <br>) exactly like the slide cards. */
 .fb b,.fb strong,.fb-ul b,.fb-ul strong{color:var(--ink);font-weight:700}
-/* A step body can be a list. Bullets carry the same reveal animation as .frag so
-   a single card can uncover its points one at a time. */
+/* A step body can be a list. Bullets share the .frag entry animation, so the
+   whole panel fades in as one when it opens. */
 .fb-ul{list-style:none;margin:.45rem 0 0;padding:0}
 .fb-ul li{position:relative;padding-left:1rem;margin-top:.3rem;
-  font-size:clamp(13px,1.05vw,15px);color:var(--ink2);line-height:1.38;
+  font-size:clamp(13.5px,1.15vw,17px);color:var(--ink2);line-height:1.44;
   opacity:0;transform:translateY(8px);filter:blur(2px);
   transition:opacity .45s ease,transform .5s cubic-bezier(.2,.7,.2,1),filter .45s ease}
 .fb-ul li:first-child{margin-top:0}
@@ -126,9 +131,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 .fb-ul li.on{opacity:1;transform:none;filter:none}
 /* A card may omit its title: the body then sits flush at the top. */
 .frag > .fb:first-child,.frag > .fb-ul:first-child{margin-top:0}
-.pcount{font-family:var(--mono);font-size:12.5px;color:var(--ink3);letter-spacing:.16em;
-  margin-top:.75rem;text-align:right}
-.pcount b{color:var(--ac)}
 
 /* ---------- stage visual (screen-space, LEFT) ---------- */
 #stageviz{position:fixed;z-index:4;left:6vw;top:16vh;width:44vw;height:62vh;
@@ -218,11 +220,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 .sl-cards[data-n="3"] .sl-card,.sl-cards[data-n="5"] .sl-card{flex-basis:29%}
 .sl-card .t{font-size:clamp(15px,1.42vw,21px);font-weight:700;color:var(--ink);letter-spacing:-.012em}
 .sl-card .b{font-size:clamp(12.5px,1.1vw,16px);color:var(--ink2);line-height:1.46;margin-top:.62rem}
-.sl-card .b b,.sl-card .b strong{color:var(--ink);font-weight:700}
-.sl-card .b ul.sl-ul{margin:.1rem 0 0;padding:0;list-style:none}
-.sl-card .b ul.sl-ul li{position:relative;padding-left:1rem;margin-top:.28rem}
-.sl-card .b ul.sl-ul li:first-child{margin-top:0}
-.sl-card .b ul.sl-ul li::before{content:'▸';position:absolute;left:0;top:-.02em;color:var(--ac);font-size:.9em}
+/* Body markup is styled the same wherever a body appears: cards and stats. */
+.sl-card .b b,.sl-card .b strong,.sl-stat .b b,.sl-stat .b strong{color:var(--ink);font-weight:700}
+.sl-card .b ul.sl-ul,.sl-stat .b ul.sl-ul{margin:.1rem 0 0;padding:0;list-style:none}
+.sl-card .b ul.sl-ul li,.sl-stat .b ul.sl-ul li{position:relative;padding-left:1rem;margin-top:.28rem}
+.sl-card .b ul.sl-ul li:first-child,.sl-stat .b ul.sl-ul li:first-child{margin-top:0}
+.sl-card .b ul.sl-ul li::before,.sl-stat .b ul.sl-ul li::before{content:'▸';position:absolute;left:0;top:-.02em;color:var(--ac);font-size:.9em}
 
 /* layout: stats — big mono numbers */
 .sl-stats{display:flex;flex-wrap:wrap;gap:.9rem;justify-content:center;align-items:stretch}
@@ -234,8 +237,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 .sl-stats[data-n="2"] .sl-stat{flex-basis:42%}
 .sl-stat .v{font-family:var(--mono);font-size:clamp(30px,4.2vw,64px);font-weight:700;color:var(--ac);
   letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
-.sl-stat .t{font-size:clamp(13px,1.2vw,17.5px);font-weight:650;color:var(--ink);margin-top:.45rem;letter-spacing:-.012em}
-.sl-stat .b{font-size:clamp(11px,.95vw,13.5px);color:var(--ink2);line-height:1.4;margin-top:.28rem}
+.sl-stat .t{font-size:clamp(15px,1.42vw,21px);font-weight:700;color:var(--ink);margin-top:.5rem;letter-spacing:-.012em}
+.sl-stat .b{font-size:clamp(12.5px,1.1vw,16px);color:var(--ink2);line-height:1.46;margin-top:.4rem}
 
 /* soft title over the map (overview first view) */
 #overtitle{position:fixed;z-index:4;left:50%;top:6.5vh;transform:translateX(-50%) translateY(-8px);
@@ -250,14 +253,20 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 .demohead .kick{margin-bottom:0}
 .demottl{font-size:clamp(24px,3.4vw,46px);font-weight:780;letter-spacing:-.02em;line-height:1.03}
 .demonote{font-family:var(--mono);font-size:clamp(11px,1vw,13.5px);color:var(--ink3);line-height:1.65;letter-spacing:.02em;max-width:30ch}
-/* portrait frame: height-driven, auto-fits the video's real aspect (set inline on loadedmetadata) */
-.demostage{position:relative;height:min(80vh,780px);aspect-ratio:9/16;flex:0 0 auto;margin:0;
+/* Two portrait clips side by side. The pair is height-driven like the single
+   frame was, just shorter: two 9:16 frames at the old 80vh would need ~880px of
+   width and would push the heading off the slide. */
+.demostages{display:flex;flex-direction:row;align-items:flex-start;gap:clamp(.8rem,1.6vw,1.6rem);flex:0 0 auto}
+.democlip{display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.demostage{position:relative;height:min(66vh,600px);aspect-ratio:9/16;flex:0 0 auto;margin:0;
   border-radius:18px;overflow:hidden;background:rgba(var(--glass),.5);border:1px solid var(--line);
   box-shadow:0 24px 70px rgba(0,0,0,.45)}
+.democap{font-family:var(--mono);font-size:clamp(11px,1vw,13.5px);color:var(--ink2);letter-spacing:.06em}
 @media (max-width:900px){
   .overlay.demo{flex-direction:column;gap:2.4vh}
   .demohead{max-width:none;text-align:center;align-items:center}
-  .demostage{height:62vh}
+  .demostage{height:40vh}
+  .demostages{gap:.7rem}
 }
 
 .media-video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block}
@@ -286,6 +295,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
   font-family:var(--mono);font-size:clamp(10px,.9vw,12px);color:var(--ink);letter-spacing:.02em;
   padding:.55rem .8rem .9rem;background:linear-gradient(180deg,rgba(var(--scrim),.92),transparent)}
 
+/* arbiter block: gauge on top, the solidified-mesh shot below it. The SVG must
+   drop the global stageframe rule (svg{height:100%}) or it would claim the whole
+   frame and squeeze the photo to nothing. */
+.arbcol{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;padding:14px 14px 12px}
+.arbsvg{flex:1 1 54%;min-height:0}
+.stageframe .arbsvg svg{height:100%}
+.arbphoto{flex:0 0 42%;min-height:0}
+/* The shot is a wide 16:9 frame landing in a short strip, so `cover` would crop
+   it centred and cut the subject's head. Bias the crop to where the object sits. */
+.arbphoto .media-image{object-position:52% 34%}
+
 /* render block: unreal photos over the dream-cloud */
 .render-cloud{position:absolute;inset:0}
 .renderphotos{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:26px 14px 14px}
@@ -311,6 +331,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 #who .tag.silvia.act{background:var(--rose);border-color:var(--rose)}
 #clock{right:var(--edge);bottom:3.2vh;color:var(--ink2)}
 #clock.warn{color:var(--amber)} #clock.over{color:var(--hi)}
+#clock.idle{opacity:.32}
 #progress{position:fixed;left:0;bottom:0;height:3px;z-index:6;width:100%;background:rgba(var(--track),var(--track-a))}
 #progress .fill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--rose));transition:width .6s cubic-bezier(.2,.7,.2,1)}
 .hint{position:fixed;right:var(--edge);bottom:8vh;z-index:6;font-family:var(--mono);font-size:11px;color:var(--ink3);opacity:.7;transition:opacity .6s}
@@ -337,13 +358,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 <div id="stage"><div id="camera"><!-- world injected --></div></div>
 <div id="detailscrim"></div>
 
-<div class="chrome" id="brand"><span class="d"></span> DreamWalking</div>
 <div class="chrome" id="counter"><b id="cnum">INTRO</b></div>
 <div class="chrome" id="who">
   <span class="tag" id="tag-m">Matteo</span>
   <span class="tag silvia" id="tag-s">Silvia</span>
 </div>
-<div class="chrome" id="clock">00:00</div>
+<div class="chrome idle" id="clock">00:00</div>
 <div id="progress"><div class="fill" id="pfill"></div></div>
 <!-- <div class="hint" id="hint"><span data-act="help">? aiuto</span> &nbsp;·&nbsp; <span data-act="next">→ avanti</span> &nbsp;·&nbsp; <span data-act="map">O mappa</span></div> -->
 
@@ -356,7 +376,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
     <span class="ptag" id="ptag"></span>
   </div>
   <div class="psteps" id="psteps"></div>
-  <div class="pcount" id="pcount"></div>
 </aside>
 
 <div id="stageviz">
@@ -402,14 +421,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
     <h2 class="demottl">Il sistema in funzione <span class="em">·</span> pipeline completa</h2>
     <div class="demonote">Dall'EEG immaginato alla mesh 3D nel visore: l'intero ciclo di co-immaginazione, end-to-end.</div>
   </div>
-  <div class="demostage" id="demoStage"></div>
+  <div class="demostages">
+    <div class="democlip"><div class="demostage" id="demoStageA"></div><div class="democap">«ombrello»</div></div>
+    <div class="democlip"><div class="demostage" id="demoStageB"></div><div class="democap">«banana»</div></div>
+  </div>
 </div>
 
 <div id="help">
   <h4>Comandi</h4>
   <div><kbd>→</kbd><kbd>Spazio</kbd> avanti (passo / dive) &nbsp; <kbd>←</kbd> indietro</div>
   <div><kbd>O</kbd> mappa &nbsp; <kbd>1</kbd>–<kbd>9</kbd> vai al blocco &nbsp; <kbd>Home</kbd> intro &nbsp; <kbd>End</kbd> fine</div>
-  <div><kbd>F</kbd> schermo intero &nbsp; <kbd>T</kbd> reset timer &nbsp; <kbd>B</kbd> luce/buio &nbsp; <kbd>?</kbd> chiudi</div>
+  <div><kbd>F</kbd> schermo intero &nbsp; <kbd>G</kbd> avvia timer &nbsp; <kbd>T</kbd> azzera timer &nbsp; <kbd>B</kbd> luce/buio &nbsp; <kbd>?</kbd> chiudi</div>
   <div style="color:var(--ink3);margin-top:.9rem">Click a destra = avanti · a sinistra = indietro · su un nodo = dive</div>
 </div>
 
@@ -418,7 +440,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
 const SLIDES = [
 
   /* ---------------------------------------------------------------- AGENDA */
-  { id:'agenda', phase:'pre', presenter:'m', accent:'cyan',
+  { id:'agenda', phase:'pre', presenter:'s', accent:'cyan',
     kicker:'Scaletta',
     lead:'',
     layout:'list',
@@ -434,7 +456,7 @@ const SLIDES = [
     note:'' },
 
   /* ----------------------------------------------------------------- GOALS */
-  { id:'goals', phase:'pre', presenter:'m', accent:'cyan',
+  { id:'goals', phase:'pre', presenter:'s', accent:'cyan',
     kicker:'Contesto e obiettivi',
     title:'Ricostruire un oggetto immaginato senza fMRI',
     layout:'cards',
@@ -445,15 +467,15 @@ const SLIDES = [
         b:'I dispositivi per <b>EEG (elettroencefalogramma)</b> sono economici e portatili, ma hanno bassa risoluzione spaziale e un segnale molto più rumoroso.' },
       { t:'La domanda di partenza',
         b:'Dato l’EEG registrato mentre una persona immagina un oggetto, il sistema può produrne una resa tridimensionale?' },
-      { t:'Obiettivo 1: un solo encoder per caschi diversi', accent:'amber',
-        b:['I dataset sono montati con sistemi <b>da 2 a 128 elettrodi</b>: serve un encoder che accetti qualunque montaggio.' ]},
-      { t:'Obiettivo 2: creare un ciclo', accent:'amber',
+        { t:'Obiettivo: creare un ciclo', accent:'amber',
         b:[['Far parlare all’EEG la <b>stessa lingua</b> del generatore 3D (senza traduttori);' ], ['associare la stima rumorosa a un oggetto presente in un <b>catalogo</b>;'], ['chiudere il <b>ciclo di co-immaginazione</b> mostrando l’incertezza in realtà virtuale.']]},
+      { t:'Obiettivo di progetto: un encoder per caschi diversi', accent:'amber',
+        b:['I dataset sono montati con sistemi <b>da 5 a 128 elettrodi</b>: l’encoder è <i>progettato</i> per accettarli tutti, e questo è un fatto di architettura.','Che ciò basti a <b>trasferire</b> da un casco a un altro quello che il modello impara resta una domanda aperta: in questa tesi non è stata verificata.' ]},
     ],
     },
 
   /* ----------------------------------------------------------------- SOTA 1 */
-  { id:'sota1', phase:'pre', presenter:'s', accent:'amber',
+  { id:'sota1', phase:'pre', presenter:'m', accent:'amber',
     kicker:'Stato dell’arte · 1',
     title:'Leggere il cervello è possibile. Ma con una macchina non indossabile, e in due dimensioni',
     lead:'',
@@ -462,7 +484,7 @@ const SLIDES = [
       { t:'Con la fMRI i risultati sono ottimi',
         b:'<b>MindEye (2023)</b> ricostruisce l’immagine osservata con il 93,8% di successo sulla prima della lista; <b>MindEye2 (2024)</b> con il 92,1%. Entrambi leggono la fMRI.' },
       { t:'Con l’EEG i numeri crollano',
-        b:'Su THINGS-EEG2, <b>NICE-EEG (2024)</b> si ferma al 15,6% e <b>ATM (2024)</b> al 21,1%, contro uno 0,5% del caso.' },
+        b:'Su <b>THINGS-EEG2</b>, <b>NICE-EEG (2024)</b> si ferma al 15,6% e <b>ATM (2024)</b> al 21,1%, contro uno 0,5% del caso.' },
       { t:'Non è un difetto dei sistemi EEG',
         b:'Il divario fra 93,8% e 15-21% riflette la differenza di risoluzione spaziale fra le due misure, non un limite della strumentazione EEG.' },
       { t:'Tutti si fermano a due dimensioni',
@@ -473,14 +495,14 @@ const SLIDES = [
     note:'' },
 
   /* ----------------------------------------------------------------- SOTA 2 */
-  { id:'sota2', phase:'pre', presenter:'s', accent:'amber',
+  { id:'sota2', phase:'pre', presenter:'m', accent:'amber',
     kicker:'Stato dell’arte · 2',
     title:'Perché con l’EEG nessuno l’ha ancora fatto',
     lead:'',
     layout:'cards',
     items:[
       { t:'Ostacolo 1: i modelli fondazionali EEG non gestiscono montaggi nuovi',
-        b:[['<b>BENDR (2022)</b>, <b>Neuro-GPT</b> e <b>Brant</b> lavorano su un numero fisso di canali; <b>BIOT (2023)</b> e <b>LaBraM (2024)</b> riconoscono gli elettrodi dal nome.'],['Nessuno riporta il segnale su un substrato condiviso prima di codificarlo: davanti a un casco mai visto non generalizzano.']] },
+        b:[['<b>BENDR (2022)</b>, <b>Neuro-GPT</b> e <b>Brant</b> lavorano su un numero fisso di canali; <b>BIOT (2023)</b> e <b>LaBraM (2024)</b> riconoscono gli elettrodi dal nome.'],['Nessuno riporta il segnale su un substrato condiviso prima di codificarlo: la generalizzazione a un casco mai visto resta un problema aperto, per la letteratura come per questo lavoro.']] },
       { t:'Ostacolo 2: la generalizzazione tra soggetti',
         b:'Quasi tutti i lavori valutano sullo <b>stesso soggetto</b> su cui hanno addestrato. Su una persona nuova la prestazione crolla, spesso fino al livello del caso.' },
       { t:'Ostacolo 3: i generatori 3D non parlano la lingua giusta',
@@ -490,10 +512,10 @@ const SLIDES = [
       { t:'Il vuoto che la tesi riempie',
         b:'Nessun lavoro di decodifica EEG sfrutta il fatto che un generatore 3D possa condividere lo spazio di rappresentazione con un encoder visivo; e, a nostra conoscenza, nessun lavoro pubblicato mappa direttamente l’EEG di superficie su ricostruzioni tridimensionali.' },
     ],
-    note:'Validazione su Gao et al. (2026): 22 partecipanti, 10 concetti in tre categorie, finestra di immaginazione di 4 secondi.' },
+    note:'Dataset di validazione — Gao et al. (2026): EEG a 32 canali, singolo laboratorio; 22 partecipanti registrati, 10 concetti in tre categorie (figure geometriche, animali, oggetti di uso quotidiano), finestra di immaginazione di 4 secondi. Le analisi riportate in questa tesi usano il soggetto 01.' },
 
   /* ----------------------------------------------------------------- TECH 1 */
-  { id:'tech1', phase:'pre', presenter:'m', accent:'violet',
+  { id:'tech1', phase:'pre', presenter:'s', accent:'violet',
     kicker:'Tecnologie · 1',
     title:'Concetti fondamentali: il segnale e lo spazio visivo',
     layout:'cards',
@@ -507,7 +529,7 @@ const SLIDES = [
       { t:'DINOv2',
         b:'Un modello di visione addestrato su 142 milioni di immagini senza etichette e senza linguaggio: organizza lo spazio per pura apparenza visiva. È l’unico bersaglio di allineamento, perché è già l’interfaccia del generatore 3D.' },
       { t:'Il vettore riassunto dell’immagine',
-        b:'DINOv2 riassume un’intera immagine in 1536 numeri. È il formato che l’encoder EEG deve imitare e che Hunyuan3D si aspetta in ingresso. Lo chiamiamo l’impronta visiva del concetto.' },
+        b:'DINOv2 riassume un’intera immagine in 1536 numeri (<b>token CLS</b>). È il formato che l’encoder EEG deve imitare e che Hunyuan3D si aspetta in ingresso. Lo chiamiamo l’impronta visiva del concetto.' },
     ],
     note:'' },
 
@@ -531,60 +553,74 @@ const SLIDES = [
     ],
     note:'' },
 
-  /* -------------------------------------------------------------- RESULTS 1 */
+  /* -------------------------------------------------------------- RESULTS 1
+     Three figures, not four: the null distribution (0,494) says the same thing
+     as the p-value computed from it, so it lives inside the p-value card.
+     The third figure used to be "45/45 · tutte le coppie ordinate bene". The
+     code counts pairs whose two per-side verdicts average >= 0.5 — i.e. pairs
+     that are not wrong on BOTH sides, not pairs that are wholly correct. At
+     0,744 a share of the individual comparisons is necessarily wrong, so the
+     old wording contradicted the headline number on its own slide, and the
+     prepared Q&A already concedes the count is a coarse statistic not worth
+     defending. The headline slot therefore carries the single-trial figure,
+     which is defensible under questioning; the pair count moves to the note
+     in its exact form ("no pair wrong on both sides").
+     presenter was 'm' while tappa 27 of the script is spoken by S. */
   { id:'results1', phase:'post', presenter:'m', accent:'rose',
     kicker:'Risultati · il risultato principale',
-    title:'Su concetti mai visti in addestramento',
-    lead:'Una mappa lineare addestrata su determinati concetti riesce a collocarne uno nuovo, mai visto, nella regione giusta dello spazio DINOv2, abbastanza da distinguerlo da un distrattore.',
+    title:'Il segnale generalizza a concetti mai visti',
+    lead:'Addestrata su un gruppo di concetti, una mappa lineare colloca un concetto <b>mai visto</b> nella regione giusta dello spazio DINOv2: abbastanza da distinguerlo da un distrattore. È la precondizione della ricerca in catalogo.',
     layout:'stats',
     items:[
-      { v:'0,744', t:'Somiglianza su concetti mai visti', b:'Media per concetto; 0,724 calcolando trial per trial. Il livello del caso è 0,500.' },
-      { v:'0,494', t:'Distribuzione nulla',                b:'Rimescolando le etichette il risultato torna esattamente al livello del caso.' },
-      { v:'p = 0,005', t:'Significatività',                b:'Su 200 permutazioni: il risultato non si spiega con il caso.' },
-      { v:'45/45', t:'Coppie dalla parte giusta',          b:'Tutte le coppie di concetti confrontate sono state ordinate correttamente.' },
+      { v:'0,744', t:'Concetti mai visti',
+        b:'Identificazione fra due alternative, protocollo <b>leave-pair-out</b>: entrambi i concetti del confronto sono esclusi dall’addestramento. Livello del caso <b>0,500</b>.' },
+      { v:'p = 0,005', t:'Significatività',
+        b:'Su 200 rimescolamenti delle etichette, che riportano l’accuratezza al caso (<b>0,494</b>): il risultato non si spiega con il caso.' },
+      { v:'0,724', t:'Trial per trial',
+        b:'La stessa misura sui singoli trial anziché come media per concetto: il risultato non dipende dall’aggregazione. Caso <b>0,500</b>.' },
     ],
-     },
+    note:'Dati: Gao et al. (2026), dataset EEG pubblico esterno (32 canali, singolo laboratorio) — soggetto 01, 10 concetti × 40 trial, finestra di immaginazione 4 s. Feature: covarianza spaziale multibanda dei canali di scalpo (4 bande) → mappa ridge verso il CLS di DINOv2. Coerenza fra coppie: in nessuna delle 45 coppie entrambi i verdetti sono sbagliati. Con il protocollo ingenuo escludi-uno lo stesso dato dà 0,322, sotto il caso: è una distorsione del protocollo (la ridge contrae le predizioni verso il centro dei concetti di addestramento), non un fallimento del segnale.' },
 
-  /* -------------------------------------------------------------- RESULTS 2 */
-  { id:'results2', phase:'post', presenter:'s', accent:'rose',
-    kicker:'Risultati · analisi',
-    title:'Analisi dei dati e interpretazione',
-    lead:'Dati: Gao et al., soggetto 01, 10 concetti per 40 trial, finestra di immaginazione di 4 secondi.',
+  /* ------------------------------------------------ RESULTS 2 + CONCLUSIONS
+     One slide instead of two: analysis and conclusions tell a single story and
+     splitting it made each half read as disconnected facts. Four cards as a
+     sequence — what the signal distinguishes, where the system stops, why,
+     what follows. Corrections against the previous version:
+       · card 1 quoted only the SOURCE column (0,787 / 0,296) without saying so,
+         two slides after the script concedes the headline result is on scalp
+         covariance; both columns are now on the slide, so tappa 27 and tappa 28
+         cannot be made to collide;
+       · the four cross-category concepts are not in four categories — the
+         dataset has three (dog=animal, circle=shape, cup and scissors=objects) —
+         so the wording is now "che attraversano le tre categorie";
+       · "cioè il caso" for 0,296 against a chance of 0,25 asserted an identity
+         that is not one: now "indistinguibili dal caso";
+       · Participant 2 came from the session with the electrode fault and is no
+         longer quoted as a measurement; it sits in the note with its caveat,
+         matching the prepared Q&A instead of contradicting it;
+       · the g.HIamp denominator (10 sessions, ~479 trials) is stated instead of
+         omitted, which is what the defence pack recommends volunteering;
+       · the non-randomised presentation order is now named among the limits;
+       · "margine" meant two different things in cards 3 and 4; the word is gone.
+     The centroid artefact (0,322) moved to the note of the previous slide. */
+  { id:'closing', phase:'post', presenter:'m', accent:'rose',
+    kicker:'Risultati · conclusioni e limiti',
+    title:'Che cosa dice il segnale, dove si ferma il sistema',
+    lead:'Due fonti di dati distinte: il <b>dataset esterno di Gao et al.</b> per i test di decodifica, le <b>nostre sessioni g.HIamp</b> per il sistema in funzione.',
     layout:'cards',
     items:[
-      { t:'La decodifica funziona bene per categorie',
-        b:'Fra categorie diverse (<i>animali</i>, <i>forme</i>, <i>oggetti</i>) il sistema arriva a 0,787, contro un caso di 0,25.' },
-      { t:'Risultati peggiori per singoli oggetti',
-        b:'Dentro la stessa categoria (<i>oggetti</i>: <i>sedia</i>, <i>tazza</i>, <i>orologio</i>, <i>forbici</i>) resta a 0,296: il livello del caso.' },
-      { t:'L’artefatto del centroide',
-        b:[ 'Con il protocollo «escludi-uno» l’accuratezza è <b>0,322</b>, sotto il livello del caso (<b>0,500</b>). Lo stesso risultato si otterrebbe con un modello che non sa nulla.',
-  'La ridge, per non sovra-adattarsi, tira le predizioni verso il <b>centro</b> dei concetti di addestramento. Il concetto giusto è stato escluso, quindi sta in periferia; il distrattore invece <b>era nel training</b>, quindi sta vicino al centro.',
-  'Così la predizione cade sempre più vicina al distrattore che alla risposta giusta. Il numero sotto il caso è la firma di una <b>distorsione del protocollo</b>, non di un fallimento del modello.',] },
-      { t:'Il protocollo «escludi-la-coppia»',
-        b: ['Si escludono dal training <b>entrambi</b> i concetti del confronto: nessuno dei due è più centrale dell’altro.',
-  'La contrazione li penalizza allo stesso modo, il bias si annulla per simmetria e riemerge il segnale vero: <b>0,744</b>.',] },
+      { t:'1 · Il segnale dice il tipo di oggetto, non quale',
+        b:'<b>Gao et al.</b>, scelta fra quattro concetti, caso <b>0,25</b>. Quattro concetti che attraversano le tre categorie (cane, cerchio, tazza, forbici): <b>0,696</b> al cuoio capelluto e <b>0,787</b> proiettando alle sorgenti. Quattro concetti della <i>stessa</i> categoria (sedia, tazza, orologio, forbici): <b>0,267</b> e <b>0,296</b>, indistinguibili dal caso in entrambi gli spazi.' },
+      { t:'2 · Il sistema completo gira, non è ancora accurato',
+        b:'<b>Nostre sessioni g.HIamp.</b> Acquisizione, decodifica, ricerca in catalogo, generazione 3D e rendering funzionano in tempo reale, con partecipanti veri. La decodifica però resta al livello del caso: <b>0,20</b> contro un caso di <b>0,25</b> sul Partecipante 1, l’unica delle due sessioni riportate con qualità del segnale adeguata.' },
+      { t:'3 · Dove si perde il segnale: l’encoder',
+        b:'È addestrato su segnali registrati mentre le persone <b>guardano</b>, e usato mentre <b>immaginano</b>. Sul dataset di <b>Gao et al.</b> la pipeline di produzione (encoder + LoRA) riconosce comunque il concetto fra dieci alternative: <b>0,248</b> contro un caso di <b>0,100</b> (p &lt; 0,01). Non si annulla, si degrada — un decodificatore a covarianza arriva a <b>0,276</b>.' },
+      { t:'4 · Che cosa è dimostrato e che cosa resta da fare',
+        b:['<b>Dimostrato:</b> un oggetto immaginato è linearmente mappabile in DINOv2 e generalizza a concetti mai visti.',
+           '<b>Da fare:</b> sostituire l’encoder congelato con quella mappa lineare, riaddestrata su immaginazione.',
+           '<b>Limiti:</b> un solo soggetto nel test principale; decodifica categoriale, non fine; ordine di presentazione non randomizzato nelle sessioni proprie, che restano perciò esplorative; ciclo interattivo non ancora validato.'] },
     ],
-    note:'' },
-
-  /* ----------------------------------------------------------------- LIMITS */
-  { id:'limits', phase:'post', presenter:'m', accent:'amber',
-    kicker:'Conclusioni',
-    title:'Risultato negativo e limiti',
-    lead:'',
-    layout:'cards',
-    items:[
-      { t:'La pipeline completa non batte il caso',
-        b:'Con l’encoder congelato, il LoRA e la ricerca in catalogo, le sessioni proprie restano <b>al livello del caso o sotto</b>: 0,20 contro 0,25 su P1, 0,35 contro 0,33 su P2. L’encoder appreso fa strettamente <b>peggio di una semplice mappa lineare</b>.' },
-      { t:'Motivo: il collo di bottiglia è l’encoder',
-        b:'L’encoder è addestrato su segnali registrati mentre le persone <b>guardano</b>, ma viene usato mentre <b>immaginano</b>: <b>collassa</b> il segnale di immaginazione prima che l’informazione di categoria sia sfruttabile. Il LoRA, su poche decine di esempi, si adatta a memoria.' },
-      { t:'L’implicazione è architetturale, non concettuale',
-        b:'Non è l’idea a non funzionare: il segnale c’è e una mappa lineare lo trova. La conseguenza è sostituire l’encoder congelato con una <b>mappa lineare verso DINOv2</b>.' },
-      { t:'I limiti dei dati',
-        b:'Il risultato su concetti mai visti riguarda un solo soggetto, 10 concetti e 40 trial. La metrica è una scelta forzata fra due alternative, non una ricerca aperta su milioni di immagini.' },
-      { t:'Ciò che non è ancora provato',
-        b:['Il ciclo interattivo è implementato ed esercitato con partecipanti reali, ma non ancora valutato in uno studio confermativo.', 'La generalizzazione fra montaggi diversi è una proprietà di progetto, non una proprietà testata empiricamente.'] },
-    ],
-    note:'' },
+    note:'Gao et al. (2026): dataset EEG pubblico esterno, soggetto 01, 10 concetti × 40 trial. Sessioni g.HIamp: 10 sessioni acquisite con almeno 20 trial (circa 479 trial, 7 partecipanti); in tesi ne riportiamo 2, per 152 trial. La sessione del Partecipante 2 proviene da una registrazione con guasto agli elettrodi attivi e non è usata come misura. Lo 0,248 della pipeline di produzione va letto come limite superiore: la validazione incrociata non raggruppa per blocco e il soggetto è uno solo.' },
 
 ];
 /* === SLIDES:END === */
@@ -612,26 +648,25 @@ function layout(blocks){
 }
 
 const BLOCKS = layout([
-  { id:'eeg',       n:'01', presenter:'m', accent:'cyan',   col: 0, row: 0, w: 380,
+  { id:'eeg',       n:'01', presenter:'s', accent:'cyan',   col: 0, row: 0, w: 380,
     title:'Acquisizione del segnale cerebrale', tag:'Acquisizione', oneLiner:'', steps:[
       { t:'Procedimento', b:[
         'L’amplificatore indossabile registra l’attività della corteccia mentre l’utente immagina l’oggetto, senza averlo davanti.',
-        'Il segnale viene riportato a <b>250 Hz</b> e tagliato in finestre di <b>256 campioni</b> (circa un secondo) con le posizioni nominate dal sistema <b>10-5</b>.',
-        'Le finestre che superano <b>±150 µV</b> da picco a picco vengono scartate prima di passare all’encoder.',
+        'Il flusso in tempo reale è tagliato in finestre di <b>256 campioni</b> alla frequenza nativa dell’amplificatore (sul g.HIamp, ~<b>0,21 s</b>), con i canali nominati secondo il sistema <b>10-5</b>. Le epoche delle analisi offline sono invece da <b>3 s</b>.',
+        'Il ricampionamento a 250 Hz e il rigetto a <b>±150 µV</b> picco-picco sono <b>specifiche di progetto non attive</b> nella configurazione valutata: nessuna finestra è stata scartata per ampiezza.',
       ] },
-      { t:'Indipendenza dal dispositivo', b:[
+      { t:'Un solo formato, per qualunque casco', b:[
         'Ogni amplificatore si collega con <b>LSL</b>: dal g.HIamp a 64 canali all’Emotiv Insight 2 a 5 canali.',
-        'Quello che esce non porta più traccia del dispositivo usato: è un pacchetto di segnale che l’encoder può leggere da qualunque sorgente.',
+        'Quello che esce ha sempre la stessa forma, qualunque sia il casco d’ingresso: è un pacchetto di segnale che l’encoder può leggere da qualunque sorgente.',
       ] },
     ] },
-  { id:'encoder',   n:'02', presenter:'s', accent:'cyan',   col: 1, row: 0,
-    title:'Encoder indipendente dal casco', tag:'Encoder · allineamento a DINOv2', oneLiner:'', steps:[
-      { t:'EnigmaBrainMap', b:'Una rete convoluzionale da circa <b>8,7 milioni</b> di parametri. Il segnale, da qualunque casco arrivi, viene portato in una rappresentazione comune indipendente dal dispositivo.' },
+  { id:'encoder',   n:'02', presenter:'m', accent:'cyan',   col: 1, row: 0,
+    title:'Encoder progettato per qualunque montaggio', tag:'Encoder · allineamento a DINOv2', oneLiner:'', steps:[
+      { t:'EnigmaBrainMap', b:'Una rete convoluzionale da circa <b>8,7 milioni</b> di parametri. Il segnale, da qualunque casco arrivi, viene portato in una rappresentazione comune: l’architettura è <i>progettata</i> per accettare qualunque montaggio, mentre il <b>trasferimento</b> effettivo fra caschi diversi resta da dimostrare.' },
       {b:'L’encoder trasforma il segnale cerebrale in una lista di <b>1536 numeri</b> (vettore <b>CLS</b>), lo stesso formato che il generatore 3D si aspetta in ingresso. Tutte le impronte hanno la stessa lunghezza (<b>normalizzazione</b>).'},
       { t:'Bersagli graduati', b:[['L’encoder viene addestrato su molti esempi in blocco, allenandosi ad avvicinare quello giusto e allontanare gli altri.'], ['Il criterio standard tratterebbe però immagini diverse dello stesso oggetto come lontane l’una dall’altra. '], [' Abbiamo perciò fornito a ogni esempio un grado di correttezza proporzionale alla reale somiglianza tra concetti: in questo modo, il modello impara la <b>struttura semantica condivisa</b> anziché memorizzare i singoli stimoli.']] },
-      { b:'Le prove empiriche mostrano che l’encoder congelato fa collassare il segnale di immaginazione, performando peggio di una semplice mappa lineare. Lo presentiamo quindi come primo componente sostituibile e come <b>risultato negativo documentato</b>.' },
     ] },
-  { id:'retrieval', n:'03', presenter:'m', accent:'cyan',   col: 2, row: 0,
+  { id:'retrieval', n:'03', presenter:'s', accent:'cyan',   col: 2, row: 0,
     title:'Ricerca nel catalogo visivo · FAISS', tag:'Recupero', oneLiner:'', steps:[
       { t:'Ricerca anziché generazione', b:'Al generatore 3D non viene fornito direttamente il vettore rumoroso stimato dall’EEG, ma <b>un\'immagine</b> recuperata da un catalogo.' },
       { b:'Il catalogo indicizza circa <b>14 milioni</b> di fotografie di <b>ImageNet-21k</b>, organizzate per somiglianza.' },
@@ -642,37 +677,36 @@ const BLOCKS = layout([
   '<b>Qualità</b>: il generatore è nato per lavorare su immagini reali e produce forme nettamente migliori ricevendo queste al posto dei vettori.',
 ] },
     ] },
-  { id:'gen',       n:'04', presenter:'s', accent:'cyan',   col: 3, row: 0, w: 380,
+  { id:'gen',       n:'04', presenter:'m', accent:'cyan',   col: 3, row: 0, w: 380,
     title:'Generazione della forma 3D · Hunyuan3D', tag:'Generazione 3D', oneLiner:'', steps:[
       { t:'Da immagine a oggetto', b:['Hunyuan3D 2.1 riceve l\'immagine recuperata dal catalogo e ne ricava una forma tridimensionale.' , 'Il risultato è un <b>singolo oggetto 3D</b>, pronto per essere mostrato in realtà virtuale.']},
       { t:'Vantaggi', b:['Il generatore è condizionato dall’immagine reale, non dall’impronta stimata dall’EEG (ingresso pulito).','Hunyuan3D si condiziona sulle stesse feature DINOv2 che l’encoder imita: la catena si chiude senza <b>nessun adattatore in mezzo</b>.'] },
       { t:'Il collo di bottiglia', b:'La sintesi richiede <b>2-3 secondi</b>: è il punto più lento di tutta la catena.' },
     ] },
-  { id:'render',    n:'05', presenter:'m', accent:'rose',   col: 4, row: 0,
+  { id:'render',    n:'05', presenter:'s', accent:'rose',   col: 4, row: 0,
     title:'Visualizzazione volumetrica', tag:'Stato di sogno', oneLiner:'', steps:[
       { b:'L’oggetto appare in realtà virtuale come una nuvola di particelle, non come un solido già finito, in modo da rispettare l’incertezza del risultato.' },
       { t:'Il motore', b:'La scena gira in Unreal Engine 5 e viene visualizzata in un ambiente virtuale all\'interno del visore Meta Quest 3.' },
     ] },
-  { id:'feedback',  n:'06', presenter:'s', accent:'rose',   col: 4, row: 1,
+  { id:'feedback',  n:'06', presenter:'m', accent:'rose',   col: 4, row: 1,
     title:'Riscontro dell’utente · truth chain', tag:'Nominare è confermare', oneLiner:'', steps:[
       { b: ['L\'utente <b>pronuncia</b> il nome dell\'oggetto a cui ha pensato.','L\'input vocale diventa <b>testuale</b> e il prompt viene passato a <b>HunyuanDiT</b>, che ne produce un’immagine di riferimento: quella "vera" (da qui il nome <i>truth chain</i>).', 'L’immagine di riferimento viene riletta da <b>DINOv2</b> e diventa a sua volta un <b>CLS</b>.']},
       { t:'La coppia di calibrazione', b:'La coppia formata dalla verità e dall’ipotesi del sistema viene salvata su disco come dato di calibrazione.' },
     ] },
-  { id:'arbiter',   n:'07', presenter:'m', accent:'amber',  col: 3, row: 1,
+  { id:'arbiter',   n:'07', presenter:'s', accent:'amber',  col: 3, row: 1,
     title:'Somiglianza fra vettori · l’arbitro', tag:'Arbitro', oneLiner:'', steps:[
       { b:'Si misura la distanza fra verità e ipotesi tramite <b>similarità coseno</b>. Il risultato è compreso tra -1 e 1 e viene confrontato con una <b>soglia θ</b>.' },
       { t:'Se la somiglianza è alta', b:'L’oggetto virtuale si solidifica. Il bersaglio per l’addestramento era corretto e il catalogo resta com’è.' },
       { t:'Se la somiglianza è bassa', b:'L’oggetto virtuale si dissolve e viene rigenerato a partire dalla verità; il bersaglio diventa la seconda immagine e nasce una nuova voce di catalogo.' },
-      { b:'In entrambi i casi, la coppia formata da <b>segnale EEG e impronta CLS</b> viene salvata nel database.' },
-      { t:'Limite', b:'Attualmente, non è ancora prevista la decisione automatica sulla soglia θ. A decidere è il nome pronunciato dall’utente.' },
+      { b:'In entrambi i casi, la coppia formata da <b>segnale EEG e impronta CLS</b> viene salvata per il LoRA.' },
     ] },
-  { id:'trainer',   n:'08', presenter:'s', accent:'violet', col: 1, row: 1,
+  { id:'trainer',   n:'08', presenter:'m', accent:'violet', col: 1, row: 1,
     title:'Addestramento LoRA · archivio degli esempi', tag:'Adattamento', oneLiner:'', steps:[
       { t:'Adattamento per utente', b:['Si aggiunge un <b>adattatore LoRA di rango 16</b> sopra la testa di DINOv2: il resto della rete, condivisa tra utenti, resta invariato.', 'Ogni utente ha il suo database di coppie formate dal segnale EEG e dal bersaglio; a ogni conferma, il modello si aggiorna su tutte le coppie raccolte.' ]},
       { t:'L’obiettivo', b:'L’addestramento avvicina il più possibile la direzione dell’impronta prevista a quella del bersaglio.' },
       { b:'L’aggiornamento richiede <b>1-3 secondi</b>: abbastanza rapido da non interrompere la sessione.' },
     ] },
-  { id:'dbupdate',  n:'+',  presenter:'m', accent:'violet', col: 2, row: 1, w: 380,
+  { id:'dbupdate',  n:'+',  presenter:'s', accent:'violet', col: 2, row: 1, w: 380,
     title:'Aggiornamento del catalogo', tag:'Catalogo', oneLiner:'', steps:[
       { b:['Il catalogo su cui si svolge la ricerca non è statico: cresce con l’uso del sistema.', 'Una nuova voce nasce soltanto quando l’ipotesi viene <b>respinta</b>.'] },
       { t:'Inserimento rapido', b:'L’indice e le sue etichette si aggiornano insieme e il catalogo torna disponibile senza richiedere un riavvio.' },
@@ -693,6 +727,7 @@ const EDGES = [
   { from:'arbiter',   to:'dbupdate',  kind:'solid',  curve:'straight',  },
   { from:'trainer',   to:'encoder',   kind:'dashed', curve:'straight'  },
   { from:'dbupdate',  to:'retrieval', kind:'dashed', curve:'straight' },
+  { from:'trainer',   to:'eeg',       kind:'solid',  fromSide:'L', toSide:'B', corner:true, gap:10 },
 ];
 /* === DATA:END === */
 
@@ -800,6 +835,33 @@ else {
     toSide = dy > 0 ? 'T' : 'B';
 }
   const A=anchor(a,fromSide), B=anchor(b,toSide);
+  /* Orthogonal two-segment route ('corner'), for anchors whose normals are
+     perpendicular: one leg follows each normal and they meet at a single bend,
+     rounded by 'r' like the three-segment case. Which axis runs first follows
+     from the sides: a horizontal source leaves sideways and the corner sits
+     under/over the target, a vertical source leaves up/down and the corner sits
+     beside it. */
+  if(e && e.corner && ((A.nx!==0 && B.ny!==0) || (A.ny!==0 && B.nx!==0))){
+    /* 'gap' stops the path short of the target along its normal, so the marker
+       sits just outside the card instead of overlapping its edge. */
+    const gap = e.gap != null ? e.gap : 0;
+    const E = { x: B.x + B.nx*gap, y: B.y + B.ny*gap };
+    /* The bend lies where the two normals cross: on the source's line of travel
+       and on the target's. Each leg is then axis-aligned by construction. */
+    const C = A.nx!==0 ? {x:E.x, y:A.y} : {x:A.x, y:E.y};
+    const legA = Math.abs(A.x-C.x) + Math.abs(A.y-C.y);
+    const legE = Math.abs(E.x-C.x) + Math.abs(E.y-C.y);
+    const r = Math.min(e.r != null ? e.r : 24, legA, legE);
+    /* Unit steps from the bend back towards each endpoint: one is horizontal and
+       the other vertical, so the same expression serves either ordering. */
+    const ax = Math.sign(A.x-C.x), ay = Math.sign(A.y-C.y);
+    const bx = Math.sign(E.x-C.x), by = Math.sign(E.y-C.y);
+    const d = `M ${A.x} ${A.y}`
+            + ` L ${C.x + ax*r} ${C.y + ay*r}`
+            + ` Q ${C.x} ${C.y} ${C.x + bx*r} ${C.y + by*r}`
+            + ` L ${E.x} ${E.y}`;
+    return { d, mid:C };
+  }
   /* Orthogonal three-segment route: leave along the anchor normal, run straight
      across, come back in along the target's normal. 'elbow' is how far the
      crossing segment sits beyond the anchors; 'r' rounds the two corners so the
@@ -931,11 +993,10 @@ function collectWorld(){
 buildWorld();
 collectWorld();
 
-/* One advance reveals one unit: a step whose body is a plain string is a single
-   unit, a step whose body is a list spends one unit per bullet. A panel can thus
-   group its points into few cards while still uncovering them one at a time. */
+/* A detail panel is a single advance: every card and every bullet is on screen
+   the moment the panel opens. bulletsOf still decides how a step body is laid
+   out (list vs paragraph) -- it just no longer costs a step to uncover. */
 const bulletsOf = st => Array.isArray(st.b) ? st.b.flat(Infinity) : null;
-const revealCount = b => b.steps.reduce((n,st) => n + (bulletsOf(st)?.length ?? 1), 0);
 
 /* ---- scene list (linear state machine, exact inverse both ways) ---- */
 const SCENES=[];
@@ -943,7 +1004,7 @@ SCENES.push({kind:'intro'});
 SLIDES.forEach((s,si)=>{ if(s.phase!=='post') SCENES.push({kind:'slide', si}); });
 SCENES.push({kind:'overview', sub:'initial', done:-1, pulse:0});
 BLOCKS.forEach((b,bi)=>{
-  for(let j=0;j<revealCount(b);j++) SCENES.push({kind:'block', bi, sj:j});
+  SCENES.push({kind:'block', bi});
   if(bi<BLOCKS.length-1) SCENES.push({kind:'overview', sub:'between', done:bi, pulse:bi+1});
 });
 SCENES.push({kind:'demo'});
@@ -955,14 +1016,15 @@ const camera=document.getElementById('camera');
 const panel=document.getElementById('panel');
 const psteps=document.getElementById('psteps');
 const pkick=document.getElementById('pkick'), ptitle=document.getElementById('ptitle');
-const ptag=document.getElementById('ptag'), pcount=document.getElementById('pcount');
+const ptag=document.getElementById('ptag');
 const introEl=document.getElementById('intro'), outroEl=document.getElementById('outro');
-const demoEl=document.getElementById('demo'), demoStage=document.getElementById('demoStage');
+const demoEl=document.getElementById('demo');
+const demoStageA=document.getElementById('demoStageA'), demoStageB=document.getElementById('demoStageB');
 const slideEl=document.getElementById('slide'), slideBox=slideEl.querySelector('.slidebox');
 const slKick=document.getElementById('slKick'), slTitle=document.getElementById('slTitle');
 const slLead=document.getElementById('slLead'), slBody=document.getElementById('slBody');
 const slNote=document.getElementById('slNote');
-let demoSlot=null;
+let demoSlot=null;   /* array of media slots: one per demo clip */
 const overtitle=document.getElementById('overtitle');
 const tagM=document.getElementById('tag-m'), tagS=document.getElementById('tag-s');
 const whoEl=document.getElementById('who');
@@ -1023,10 +1085,13 @@ let curWho='m';
 function presenterOf(sc){
   if(sc.kind==='block') return BLOCKS[sc.bi].presenter;
   if(sc.kind==='slide') return SLIDES[sc.si].presenter==='s' ? 's' : 'm';
+  /* The map shown between two blocks belongs to whoever presents the next one;
+     the general map that opens the circuit is its own hand-off. */
   if(sc.kind==='overview' && sc.sub==='between') return BLOCKS[sc.pulse].presenter;
-  if(sc.kind==='demo') return 'm';
-  if(sc.kind==='outro') return 's';
-  return 'm';
+  if(sc.kind==='overview' && sc.sub==='initial') return 'm';
+  if(sc.kind==='demo') return 's';
+  if(sc.kind==='outro') return 'm';
+  return 's';
 }
 function setPresenter(w){
   curWho=w;
@@ -1090,9 +1155,8 @@ function updatePanel(sc){
     stepEls=[...psteps.children];
     bulletEls=[...psteps.querySelectorAll('.fb-ul li')];
   }
-  stepEls.forEach(el => el.classList.toggle('on', +el.dataset.u <= sc.sj));
-  bulletEls.forEach(el => el.classList.toggle('on', +el.dataset.u <= sc.sj));
-  pcount.innerHTML = `<b>${sc.sj+1}</b> / ${revealCount(b)}`;
+  stepEls.forEach(el => el.classList.add('on'));
+  bulletEls.forEach(el => el.classList.add('on'));
 }
 
 /* ---- linear content slides ---- */
@@ -1113,9 +1177,12 @@ function slideItems(s){
     `<div class="sl-row"><div class="sl-n">${esc(it.n||'')}</div><div class="sl-rt">`+
     `<div class="t">${esc(it.t||'')}</div>`+(it.b?`<div class="b">${esc(it.b)}</div>`:'')+
     `</div></div>`).join('')+`</div>`;
+  /* Stats bodies go through cardBody like the cards do: inline markup works and
+     an array becomes a bulleted list. Value and label stay escaped, matching the
+     convention that only bodies carry markup. */
   if(s.layout==='stats') return `<div class="sl-stats" data-n="${n}">`+items.map(it=>
     `<div class="sl-stat"><div class="v">${esc(it.v||'')}</div>`+
-    `<div class="t">${esc(it.t||'')}</div>`+(it.b?`<div class="b">${esc(it.b)}</div>`:'')+
+    `<div class="t">${esc(it.t||'')}</div>`+cardBody(it.b)+
     `</div>`).join('')+`</div>`;
   return `<div class="sl-cards" data-n="${n}">`+items.map(it=>{
     /* per-card accent override: it.accent can be a palette name (cyan/rose/amber/violet)
@@ -1153,7 +1220,7 @@ function counterText(sc){
   if(sc.kind==='overview') return 'MAPPA';
   if(sc.kind==='slide') return (SLIDES[sc.si].kicker||'SLIDE').toUpperCase();
   const b=BLOCKS[sc.bi];
-  return `${b.n} · ${sc.sj+1}/${revealCount(b)}`;
+  return `${b.n} · ${b.tag}`;
 }
 
 /* ---- master render ---- */
@@ -1165,15 +1232,22 @@ function render(instant){
   updatePanel(sc);
   updateSlide(sc);
   introEl.classList.toggle('show', sc.kind==='intro');
-  whoEl.classList.toggle('hide', sc.kind==='intro');
-  whoEl.classList.toggle('hide', sc.kind==='outro');
+  /* One toggle, one condition: classList.toggle(cls, force) *sets* the state, so
+     two calls on the same class would leave only the last one standing. */
+  whoEl.classList.toggle('hide', sc.kind==='intro' || sc.kind==='outro');
   outroEl.classList.toggle('show', sc.kind==='outro');
   demoEl.classList.toggle('show', sc.kind==='demo');
-  if(demoSlot){ if(sc.kind==='demo') demoSlot.play(); else demoSlot.pause(); }   // enter demo → muted autoplay from 0; leave → pause
+  if(demoSlot) demoSlot.forEach(s=> sc.kind==='demo' ? s.play() : s.pause());   // enter demo → both clips restart muted; leave → both pause
   overtitle.classList.toggle('show', sc.kind==='overview' && sc.sub==='initial');
   cnum.textContent = counterText(sc);
   pfill.style.width = (idx/(SCENES.length-1)*100)+'%';
   setPresenter(presenterOf(sc));
+  /* The map is only on screen for the overview and the block dives; every other
+     scene hides it behind an overlay, so the background animation can idle. */
+  /* While exporting, every scene is captured cold, so the field must paint at
+     least once even under an overlay — otherwise slides export over a blank
+     backdrop instead of the blurred particle field. */
+  bgAwake = EXPORTING || (sc.kind==='overview' || sc.kind==='block');
   pulse();
 }
 
@@ -1181,7 +1255,7 @@ function render(instant){
 function go(i, instant){ idx=Math.max(0, Math.min(SCENES.length-1, i)); render(instant); }
 function next(){ if(idx<SCENES.length-1) go(idx+1); }
 function prev(){ if(idx>0) go(idx-1); }
-function idxOfBlock(bi){ return SCENES.findIndex(s=>s.kind==='block'&&s.bi===bi&&s.sj===0); }
+function idxOfBlock(bi){ return SCENES.findIndex(s=>s.kind==='block'&&s.bi===bi); }
 /* the map is no longer scene 1 — the 'pre' slides sit between it and the intro */
 function idxOfOverview(){ const i=SCENES.findIndex(s=>s.kind==='overview'&&s.sub==='initial'); return i<0?0:i; }
 
@@ -1208,7 +1282,8 @@ document.addEventListener('keydown', e=>{
   else if(k>='1'&&k<='9'){ const bi=+k-1; if(bi<BLOCKS.length){ const t=idxOfBlock(bi); if(t>=0) go(t); } }
   else if(k==='f'||k==='F'){ toggleFS(); }
   else if(k==='b'||k==='B'){ toggleTheme(); }
-  else if(k==='t'||k==='T'){ t0=performance.now(); }
+  else if(k==='g'||k==='G'){ if(t0===null) t0=performance.now(); }   // arm -> run; ignored once running, so a stray G can't restart the count
+  else if(k==='t'||k==='T'){ t0=null; }                              // back to 00:00, stopped and armed again
   else if(k==='?'){ document.getElementById('help').classList.toggle('on'); }
   else if(k==='Escape'){ document.getElementById('help').classList.remove('on'); }
 });
@@ -1242,14 +1317,18 @@ function toggleFS(){
 addEventListener('resize', ()=>{ resizeCv(); applyCamera(cameraFor(SCENES[idx]), true); });
 
 /* timer */
-let t0=performance.now();
+/* t0 === null means "armed but not counting": the clock only starts on G, so the
+   count reflects the talk and not the time spent setting up the projector. */
+let t0=null;
 setInterval(()=>{
-  const s=Math.floor((performance.now()-t0)/1000);
-  const mm=String(Math.floor(s/60)).padStart(2,'0'), ss=String(s%60).padStart(2,'0');
   const c=document.getElementById('clock');
+  const running = t0!==null;
+  c.classList.toggle('idle', !running);
+  const s = running ? Math.floor((performance.now()-t0)/1000) : 0;
+  const mm=String(Math.floor(s/60)).padStart(2,'0'), ss=String(s%60).padStart(2,'0');
   c.textContent=`${mm}:${ss}`;
   c.classList.remove('warn','over');
-  if(s>26*60) c.classList.add('over'); else if(s>23*60) c.classList.add('warn');
+  if(running && s>26*60) c.classList.add('over'); else if(running && s>23*60) c.classList.add('warn');
 },1000);
 setTimeout(()=>{ const h=document.getElementById('hint'); if(h) h.style.opacity=0; }, 7000);
 
@@ -1258,6 +1337,13 @@ setTimeout(()=>{ const h=document.getElementById('hint'); if(h) h.style.opacity=
    ========================================================================= */
 const cv=document.getElementById('bg'), ctx=cv.getContext('2d');
 let W,H,DPR,parts=[],pulseT=0;
+/* Full-screen overlays (intro, slides, demo, outro) sit above the map behind a
+   backdrop-filter blur. While one is up nothing below it is visible, yet the
+   particle field and the flow dots keep repainting at 60fps — and because the
+   blurred backdrop changes every frame, the compositor cannot cache it and
+   re-blurs the whole viewport each time. That is what starves the two demo
+   videos. Freeze the background whenever an overlay covers it. */
+let bgAwake=true;
 function resizeCv(){
   DPR=Math.min(2,devicePixelRatio||1);
   W=cv.width=innerWidth*DPR; H=cv.height=innerHeight*DPR;
@@ -1274,6 +1360,7 @@ function field(x,y,t){
 }
 function pulse(){ pulseT=1; }
 function frame(ts){
+  if(!bgAwake){ requestAnimationFrame(frame); return; }   // overlay is up: nothing below it is visible
   const t=ts*0.001;
   ctx.clearRect(0,0,W,H);
   const accent = curWho==='s' ? PAL.partS : PAL.partM;   // reads live palette → adapts on toggle
@@ -1321,7 +1408,7 @@ const NS='http://www.w3.org/2000/svg';
 /* INK, INK2, INK3, OKC, HIC are theme-aware globals maintained by refreshPalette() */
 
 const CAP={
-  eeg:      '250 Hz · finestra <b>256 campioni</b> (~1 s)',
+  eeg:      'finestra <b>256 campioni</b> · frequenza nativa dell’amplificatore',
   encoder:  'EEG → <b>CLS 1536-d</b> · spazio DINOv2',
   retrieval:'query CLS → nearest neighbour · <b>~14M</b> ImageNet-21k',
   gen:      'immagine → SDF → <b>mesh GLB</b> · Hunyuan3D 2.1',
@@ -1366,17 +1453,6 @@ function probeImage(url){
     im.onload=()=>res(im.naturalWidth>0);
     im.onerror=()=>res(false);
     try{ im.src=url; }catch(e){ res(false); }
-  });
-}
-function probeVideo(url){
-  return new Promise(res=>{
-    const v=document.createElement('video');
-    v.preload='metadata'; v.muted=true;
-    let done=false; const fin=x=>{ if(done)return; done=true; try{ v.removeAttribute('src'); v.load(); }catch(e){} res(x); };
-    v.onloadedmetadata=()=>fin(true);
-    v.onerror=()=>fin(false);
-    try{ v.src=url; }catch(e){ fin(false); }
-    setTimeout(()=>fin(false),9000);
   });
 }
 const MEDIA_ICON={
@@ -1461,10 +1537,26 @@ function createMediaSlot(mount, opts){
     mount.appendChild(slot);
     if(opts.onState) opts.onState(false);
   }
-  (async()=>{
+  /* Video takes no pre-probe: probing spins up a second element for the same
+     file, doubling decoder pressure, and its 9s timeout turns a merely slow
+     read (file://, a cold disk, two clips at once) into a false "file missing"
+     — which is what sends a present asset to the drop-zone placeholder. Attach
+     the real element instead and let its own 'error' walk the source list, so
+     the placeholder appears only when every source genuinely fails. */
+  if(kind==='video'){
+    let i=0;
+    const tryNext=()=>{
+      if(destroyed) return;
+      if(i>=sources.length){ showPlaceholder(); return; }
+      showMedia(sources[i++],false);
+      if(cur) cur.addEventListener('error',tryNext,{once:true});
+    };
+    tryNext();
+  }
+  else (async()=>{
     let found=null;
     for(const src of sources){
-      const ok = kind==='video' ? await probeVideo(src) : await probeImage(src);
+      const ok = await probeImage(src);
       if(destroyed) return;
       if(ok){ found=src; break; }
     }
@@ -1520,11 +1612,11 @@ function viz_eeg(host,b,ac){
       g.beginPath(); g.fillStyle=`rgba(${rgb},${0.35+0.5*pul})`; g.arc(padL-30*D,cy,(3+2*pul)*D,0,6.283); g.fill();
       g.fillStyle=`rgba(${PAL.ink2RGB},0.9)`; g.font=`${12*D}px ui-monospace,monospace`; g.textBaseline='middle'; g.textAlign='right';
       g.fillText(labels[ci],padL-40*D,cy);
-      if(rejected){ g.fillStyle=`rgba(${PAL.hiRGB},0.95)`; g.textAlign='center'; g.fillText('scartata',winX+winW/2,padT+11*D); }
+      if(rejected){ g.fillStyle=`rgba(${PAL.hiRGB},0.95)`; g.textAlign='center'; g.fillText('fuori soglia',winX+winW/2,padT+11*D); }
     }
     g.textBaseline='alphabetic'; g.textAlign='left'; g.fillStyle=`rgba(${PAL.ink3RGB},0.9)`; g.font=`${11*D}px ui-monospace,monospace`;
-    g.fillText('±150 µV',padL+6*D,padT+12*D);
-    g.textAlign='center'; g.fillText('256 campioni · ~1 s',winX+winW/2,h-10*D); g.textAlign='left';
+    g.fillText('±150 µV · non attiva',padL+6*D,padT+12*D);
+    g.textAlign='center'; g.fillText('finestra 256 campioni',winX+winW/2,h-10*D); g.textAlign='left';
   }
   draw(0);
   const stop=reduced?null:raf(draw);
@@ -1668,7 +1760,7 @@ function viz_render(host,b,ac){
   cloudWrap.style.display='none';   /* cloud is a FALLBACK only: shown when a photo is missing */
   let stop=null, cloudOn=false;
   function evalCloud(){
-    const want=(missing[0]===true)||(missing[1]===true);
+    const want=missing.some(m=>m===true);
     if(want&&!cloudOn){ cloudOn=true; cloudWrap.style.display=''; draw(); if(!reduced) stop=raf(draw); }
     else if(!want&&cloudOn){ cloudOn=false; if(stop){stop();stop=null;} cloudWrap.style.display='none'; }
   }
@@ -1676,12 +1768,15 @@ function viz_render(host,b,ac){
   /* --- Unreal photos (primary content when present) --- */
   const grid=document.createElement('div'); grid.className='renderphotos'; host.appendChild(grid);
   const hint=document.createElement('div'); hint.className='render-hint'; hint.textContent='inserisci le foto Unreal in assets/'; host.appendChild(hint);
+  /* The solid-mesh shot moved to the arbiter panel, where the solidify/dissolve
+     verdict is what it illustrates. Everything below is driven by specs.length
+     so the layout follows the list instead of assuming two photos. */
   const specs=[
     { sources:['assets/unreal-1.jpg','assets/unreal-1.png'], filename:'assets/unreal-1.jpg', cap:'bassa confidenza · nuvola' },
-    { sources:['assets/unreal-2.jpg','assets/unreal-2.png'], filename:'assets/unreal-2.jpg', cap:'alta confidenza · mesh solida' },
   ];
-  const missing=[null,null];   /* null = not yet probed; true = absent; false = present */
-  function refreshHint(){ hint.style.opacity = (missing[0]||missing[1]) ? '' : '0'; }
+  grid.style.gridTemplateColumns = `repeat(${specs.length},1fr)`;
+  const missing=specs.map(()=>null);   /* null = not yet probed; true = absent; false = present */
+  function refreshHint(){ hint.style.opacity = missing.some(m=>m===true) ? '' : '0'; }
   const slots=specs.map((sp,i)=>{
     const cell=document.createElement('div'); cell.className='rphoto';
     const frame=document.createElement('div'); frame.className='rphoto-frame';
@@ -1738,8 +1833,27 @@ function viz_feedback(host,b,ac){
 /* ---- 7. ARBITER : two unit vectors + angle + gauge (s vs θ) ---- */
 function viz_arbiter(host,b,ac){
   const spread = 50;
-  const s=mkSvg(host,660,340);
-  const ox = 150 - spread, oy = 252,L=150,at=-1.02;
+  /* Two stacked rows inside the stage frame: the gauge on top, the solid-mesh
+     shot underneath. The photo is what the 'solidifica' verdict produces, so it
+     belongs next to the threshold rather than in the rendering panel. */
+  const col=document.createElement('div'); col.className='arbcol'; host.appendChild(col);
+  const svgRow=document.createElement('div'); svgRow.className='arbsvg'; col.appendChild(svgRow);
+  const photoRow=document.createElement('div'); photoRow.className='rphoto arbphoto'; col.appendChild(photoRow);
+  const photoFrame=document.createElement('div'); photoFrame.className='rphoto-frame'; photoRow.appendChild(photoFrame);
+  const photoCap=document.createElement('div'); photoCap.className='rcap';
+  photoCap.textContent='oltre la soglia · l’oggetto solidifica'; photoRow.appendChild(photoCap);
+  const photo=createMediaSlot(photoFrame,{
+    kind:'image', sources:['assets/unreal-2.jpg','assets/unreal-2.png'],
+    filename:'assets/unreal-2.jpg', permName:'assets/unreal-2.jpg',
+    label:'Foto Unreal mancante', hint:'trascina o clicca', accentHex:ac,
+    onState:(present)=>photoRow.classList.toggle('has-photo',present)
+  });
+  const s=mkSvg(svgRow,660,340);
+  /* Both arcs sit a little high in the viewBox: the photo strip below took the
+     bottom of the frame, so the graphic reads better lifted off it. One constant
+     moves the angle arc and the gauge together, keeping them on the same line. */
+  const RISE = 26;
+  const ox = 150 - spread, oy = 252 - RISE,L=150,at=-1.02;
   s.appendChild(el('circle',{cx:ox,cy:oy,r:3.5,fill:INK2}));
   const rayT=el('line',{x1:ox,y1:oy,stroke:ac,'stroke-width':2.6}); s.appendChild(rayT);
   const tipT=el('circle',{r:5,fill:ac}); s.appendChild(tipT);
@@ -1748,8 +1862,8 @@ function viz_arbiter(host,b,ac){
   const arc=el('path',{fill:'none',stroke:INK2,'stroke-width':1.6,opacity:.8}); s.appendChild(arc);
   const labT=txt('z_truth',0,0,ac,12,'start'); s.appendChild(labT);
   const labH=txt('z_hyp',0,0,INK,12,'start'); s.appendChild(labH);
-  s.appendChild(txt('cos(z_truth, z_hyp)',ox,315,INK3,12,'middle'));
-  const gx = 478 + 20, gy = 268,Rg=98,theta=0.62;
+  s.appendChild(txt('cos(z_truth, z_hyp)',ox,315 - RISE,INK3,12,'middle'));
+  const gx = 478 + 20, gy = 268 - RISE,Rg=98,theta=0.62;
   function gp(v){ const a=Math.PI-v*Math.PI; return [gx+Rg*Math.cos(a),gy-Rg*Math.sin(a)]; }
   function arcPoly(v0,v1,st){ let d=''; for(let i=0;i<=st;i++){ const v=v0+(v1-v0)*i/st,p=gp(v); d+=(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)+' '; } return d; }
   s.appendChild(el('path',{d:arcPoly(0,1,60),fill:'none',stroke:`rgba(${PAL.gridRGB},0.2)`,'stroke-width':10,'stroke-linecap':'round'}));
@@ -1780,7 +1894,7 @@ function viz_arbiter(host,b,ac){
   }
   update(0);
   const stop=reduced?null:raf(update);
-  return ()=>{ if(stop)stop(); };
+  return ()=>{ if(stop)stop(); photo.destroy(); };
 }
 
 /* ---- 8. TRAINER : low-rank A·B (r=16) + cosine-distance convergence curve ---- */
@@ -1856,13 +1970,34 @@ function teardownViz(){
 }
 stageviz.addEventListener('click', e=>{ if(e.clientX < innerWidth*0.28) prev(); else next(); });
 
-/* demo scene: pipeline video (no autoplay — presenter clicks play) */
-demoSlot=createMediaSlot(demoStage,{
-  kind:'video', fitAspect:true, sources:['assets/pipeline.mp4','assets/pipeline.webm'],
-  filename:'assets/pipeline.mp4', permName:'assets/pipeline.mp4',
-  label:'Video della pipeline non ancora inserito',
-  hint:'trascina qui il video · oppure clicca per sceglierlo', accentHex:HEX.cyan
-});
+/* demo scene: two sessions side by side. `ambient` (the default) means muted +
+   loop + inline, so each clip keeps replaying for as long as the slide is up. */
+function demoClip(mount, base, label){
+  return createMediaSlot(mount,{
+    kind:'video', fitAspect:true, ambient:true,
+    /* .mp4 first: the .mov masters are gitignored and QuickTime containers are
+       not reliably playable outside Chrome/Safari. The optimized 720p mp4s are
+       what ships with the deck; the .mov stays as a local fallback. */
+    sources:[`assets/${base}.mp4`,`assets/${base}.webm`,`assets/${base}.mov`],
+    filename:`assets/${base}.mp4`, permName:`assets/${base}.mp4`,
+    /* A still from the clip stands in until the first frame decodes — and it is
+       what a PDF export or a codec-less browser ends up showing, instead of a
+       black rectangle. */
+    poster:`assets/${base}-poster.jpg`,
+    label:`Video «${label}» non ancora inserito`,
+    hint:'trascina qui il video · oppure clicca per sceglierlo', accentHex:HEX.cyan
+  });
+}
+demoSlot=[ demoClip(demoStageA,'ombrello','ombrello'), demoClip(demoStageB,'banana','banana') ];
+
+/* Deep link: ?scene=N opens straight on scene N (0-based), which is what the PDF
+   export drives — one headless shot per scene. ?export=1 additionally freezes the
+   deck on that scene: no autoplay restart, no transitions to catch mid-flight. */
+const QS = new URLSearchParams(location.search);
+const QSCENE = QS.has('scene') ? Math.max(0, Math.min(SCENES.length-1, +QS.get('scene')||0)) : null;
+const EXPORTING = QS.get('export')==='1';
+if(QSCENE!==null) idx = QSCENE;
+if(EXPORTING) document.documentElement.classList.add('exporting');
 
 /* boot */
 render(true);
